@@ -1,52 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.5</version>
-        <relativePath/>
-    </parent>
-    <groupId>com.example</groupId>
-    <artifactId>addressbook</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>addressbook</name>
-    <description>Address Book Web Application</description>
-    <properties>
-        <java.version>17</java.version>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-</project>
+# Address Book Web Application
+
+Implement the Address Book Web Application step by step, following the instructions in `ARCHITECTURE.md`.
+
+Based on `ARCHITECTURE.md`, I know:
+- Backend: Spring Boot with Java 17+, JPA, H2, Validation
+- Frontend: HTML/CSS/JS (no frameworks)
+- REST API: `/api/contacts`
+- Entity: `Contact` with fields: First Name, Last Name, Email, Phone, Address, Category/Tag
+
+Let's implement all required files.
+
+## Files to Implement
+
+1. `pom.xml` with Spring Boot Starter Web, Data JPA, Validation, and H2 dependencies.
+2. `src/main/resources/application.yml` configured for H2 in-memory DB and H2 console enabled.
+3. Domain model: `Contact.java` entity with JPA annotations and Jakarta validation.
+4. Repository: `ContactRepository.java` extending `JpaRepository`.
+5. Service & Controller: `ContactService.java` and `ContactController.java` with REST endpoints.
+6. Data initializer: `DataInitializer.java` to seed 5 sample contacts.
+7. Frontend: `src/main/resources/static/index.html`, `styles.css`, and `app.js` providing a clean UI to view, add, edit, search, and delete contacts.
+
+Ensure all imports are present and the backend compiles cleanly with `mvn spring-boot:run`.
