@@ -1,0 +1,23 @@
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f6f9; }
+header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
+h1 { margin: 0; color: #333; }
+.controls { display: flex; gap: 10px; flex-wrap: wrap; }
+.controls input, .controls select, button { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; }
+button { background-color: #007bff; color: white; cursor: pointer; border: none; }
+button:hover { background-color: #0056b3; }
+#contactList { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+.contact-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; }
+.contact-card h3 { margin: 0 0 5px; color: #007bff; }
+.contact-card p { margin: 4px 0; color: #555; font-size: 0.9em; }
+.contact-card .actions { margin-top: 10px; display: flex; gap: 8px; }
+.edit-btn, .delete-btn { padding: 5px 10px; font-size: 0.85em; cursor: pointer; border: none; border-radius: 3px; }
+.edit-btn { background-color: #ffc107; color: #333; }
+.delete-btn { background-color: #dc3545; color: white; }
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+.modal-content { background-color: white; margin: 10% auto; padding: 20px; width: 90%; max-width: 500px; border-radius: 8px; position: relative; }
+.close { position: absolute; right: 15px; top: 10px; font-size: 24px; cursor: pointer; }
+form { display: flex; flex-direction: column; }
+label { margin-top: 10px; font-weight: bold; }
+input { padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; }
+.error { color: red; margin-top: 10px; font-size: 0.9em; min-height: 20px; }
+.required { color: red; }
