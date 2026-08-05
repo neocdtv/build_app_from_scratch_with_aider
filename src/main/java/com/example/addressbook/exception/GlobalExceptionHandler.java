@@ -2,19 +2,18 @@ package com.example.addressbook.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpRuntimeException;
 import jakarta.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@org.springframework.web.annotation.ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @org.springframework.web.config.ControllerAdvice
     private static final DateTimeFormatter TIMESTAMP_FORMAT = 
         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> handleResourceNotFound(ResourceNotFoundException ex, org.springframework.web.servlet.handler.RequestExecutionException e) {
+    public ResponseEntity<?> handleResourceNotFound(ResourceNotFoundException ex) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 

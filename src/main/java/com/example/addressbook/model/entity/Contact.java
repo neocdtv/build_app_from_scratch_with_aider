@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.CreationDate;
+import org.springframework.data.annotation.CreatedDate;
 import java.time.LocalDateTime;
 import jakarta.persistence.*;
 
@@ -44,10 +44,10 @@ public class Contact {
     private String category;
 
     @Column(updatable = false)
-    @CreationTimestamp
+    @CreatedDate
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 
     // Getters and Setters
