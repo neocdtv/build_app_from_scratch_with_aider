@@ -46,3 +46,6 @@ parallel processing can cause looping? use -np 1?
 --repeat-penalty 1.05  
 --presence-penalty 0.1  
 --device CUDA1,CUDA2
+
+# do i need it?
+--chat-template-kwargs "{\"enable_thinking\": false}"
