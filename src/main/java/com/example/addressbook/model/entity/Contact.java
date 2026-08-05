@@ -1,35 +1,58 @@
-package com.example.addressbook.model.dto;
+package com.example.addressbook.model.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-public class ContactDto {
+@Entity
+@Table(name = "contacts",
+       uniqueConstraints = {
+           @UniqueConstraint(columnNames = "email"),
+           @UniqueConstraint(columnNames = "phoneNumber")
+       })
+public class Contact {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank
+    @Size(max = 50)
+    @Column(nullable = false, length = 50)
     private String firstName;
+
+    @NotBlank
+    @Size(max = 50)
+    @Column(nullable = false, length = 50)
     private String lastName;
+
+    @NotBlank
+    @Email
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @NotBlank
+    @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$")
+    @Column(nullable = false, unique = true)
     private String phoneNumber;
+
+    @Column(length = 255)
     private String address;
+
+    @Column(length = 50)
     private String category;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    // Constructors
-    public ContactDto() {}
-
-    public ContactDto(Long id, String firstName, String lastName, String email, String phoneNumber,
-                      String address, String category, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.address = address;
-        this.category = category;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
-    // Getters & setters
+    // Getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
