@@ -1,23 +1,114 @@
-# Address Book Web Application
+spring:
+  application:
+    name: addressbook
+  datasource:
+    url: jdbc:h2:mem:addressbook
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
+server:
+  port: 8080
+````
 
-Implement the Address Book Web Application step by step, following the instructions in `ARCHITECTURE.md`.
+I notice I need to create the pom.xml file. Let me create all the necessary files:
 
-Based on `ARCHITECTURE.md`, I know:
-- Backend: Spring Boot with Java 17+, JPA, H2, Validation
-- Frontend: HTML/CSS/JS (no frameworks)
-- REST API: `/api/contacts`
-- Entity: `Contact` with fields: First Name, Last Name, Email, Phone, Address, Category/Tag
+First, I'll create the pom.xml file:
 
-Let's implement all required files.
+CODER.md
+````xml
+<<<<<<< SEARCH
+package com.example.addressbook.model.entity;
 
-## Files to Implement
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-1. `pom.xml` with Spring Boot Starter Web, Data JPA, Validation, and H2 dependencies.
-2. `src/main/resources/application.yml` configured for H2 in-memory DB and H2 console enabled.
-3. Domain model: `Contact.java` entity with JPA annotations and Jakarta validation.
-4. Repository: `ContactRepository.java` extending `JpaRepository`.
-5. Service & Controller: `ContactService.java` and `ContactController.java` with REST endpoints.
-6. Data initializer: `DataInitializer.java` to seed 5 sample contacts.
-7. Frontend: `src/main/resources/static/index.html`, `styles.css`, and `app.js` providing a clean UI to view, add, edit, search, and delete contacts.
+import java.time.LocalDateTime;
 
-Ensure all imports are present and the backend compiles cleanly with `mvn spring-boot:run`.
+@Entity
+@Table(name = "contacts",
+       uniqueConstraints = {
+           @UniqueConstraint(columnNames = "email"),
+           @UniqueConstraint(columnNames = "phoneNumber")
+       })
+public class Contact {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank
+    @Size(max = 50)
+    @Column(nullable = false, length = 50)
+    private String firstName;
+
+    @NotBlank
+    @Size(max = 50)
+    @Column(nullable = false, length = 50)
+    private String lastName;
+
+    @NotBlank
+    @Email
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @NotBlank
+    @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$")
+    @Column(nullable = false, unique = true)
+    private String phoneNumber;
+
+    @Column(length = 255)
+    private String address;
+
+    @Column(length = 50)
+    private String category;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+    // Getters and setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+}
