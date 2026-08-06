@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Address Book</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<h1>Address Book</h1>
+
+<div id="search-bar">
+    <input type="text" id="search-input" placeholder="Search by name or category">
+    <button id="search-btn">Search</button>
+</div>
+
+<table id="contacts-table">
+    <thead>
+    <tr>
+        <th>First</th><th>Last</th><th>Email</th><th>Phone</th>
+        <th>Address</th><th>Category</th><th>Actions</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<h2 id="form-title">Add Contact</h2>
+<form id="contact-form">
+    <input type="hidden" id="contact-id" />
+    <label>First Name: <input type="text" id="firstName" required></label><br>
+    <label>Last Name: <input type="text" id="lastName" required></label><br>
+    <label>Email: <input type="email" id="email" required></label><br>
+    <label>Phone: <input type="tel" id="phoneNumber" required></label><br>
+    <label>Address: <input type="text" id="address" required></label><br>
+    <label>Category: <input type="text" id="category" required></label><br>
+    <button type="submit">Save</button>
+    <button type="button" id="cancel-edit" style="display:none;">Cancel Edit</button>
+</form>
+
+<script src="app.js"></script>
+</body>
+</html>
