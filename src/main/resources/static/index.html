@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address Book</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header><h1>Address Book</h1></header>
+    <main>
+        <section id="controls">
+            <input type="text" id="searchInput" placeholder="Search by name...">
+            <button id="toggleFormBtn">Add Contact</button>
+        </section>
+        <form id="contactForm">
+            <input type="hidden" id="contactId">
+            <input type="text" id="firstName" placeholder="First Name" required>
+            <input type="text" id="lastName" placeholder="Last Name" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="text" id="phone" placeholder="Phone">
+            <input type="text" id="address" placeholder="Address">
+            <input type="text" id="category" placeholder="Category/Tag">
+            <button type="submit" id="submitBtn">Save</button>
+        </form>
+        <table id="contactTable">
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Category</th><th>Actions</th></tr></thead>
+            <tbody id="contactList"></tbody>
+        </table>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>
