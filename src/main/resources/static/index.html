@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address Book</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header><h1>Address Book</h1></header>
+    <main>
+        <section class="controls">
+            <input type="text" id="searchInput" placeholder="Search by name or category...">
+            <button id="addBtn">Add Contact</button>
+        </section>
+
+        <section id="contactTable">
+            <table>
+                <thead>
+                    <tr>
+                        <th>First Name</th><th>Last Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Category</th><th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="contactList"></tbody>
+            </table>
+        </section>
+
+        <section id="formModal" class="modal hidden">
+            <form id="contactForm">
+                <h2 id="formTitle">Add Contact</h2>
+                <input type="hidden" id="contactId">
+                <input type="text" id="firstName" placeholder="First Name" required>
+                <input type="text" id="lastName" placeholder="Last Name" required>
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="text" id="phoneNumber" placeholder="Phone" required>
+                <input type="text" id="address" placeholder="Address" required>
+                <input type="text" id="category" placeholder="Category" required>
+                <div class="form-actions">
+                    <button type="submit" id="submitBtn">Save</button>
+                    <button type="button" id="cancelBtn">Cancel</button>
+                </div>
+            </form>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>
