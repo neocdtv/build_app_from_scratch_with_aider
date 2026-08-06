@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Address Book</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+  <div class="container">
+    <h1>Address Book</h1>
+    <input type="text" id="searchInput" placeholder="Search by name or category..." onkeyup="searchContacts()">
+    <form id="contactForm">
+      <input type="hidden" id="contactId">
+      <input type="text" id="firstName" placeholder="First Name" required>
+      <input type="text" id="lastName" placeholder="Last Name" required>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="text" id="phoneNumber" placeholder="Phone Number" required>
+      <input type="text" id="address" placeholder="Address" required>
+      <input type="text" id="category" placeholder="Category" required>
+      <button type="submit">Save</button>
+      <button type="button" id="cancelBtn" style="display:none;" onclick="resetForm()">Cancel</button>
+    </form>
+    <table id="contactsTable"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Category</th><th>Actions</th></tr></thead><tbody></tbody></table>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
