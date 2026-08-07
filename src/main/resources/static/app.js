@@ -14,7 +14,9 @@ async function fetchContacts() {
         const res = await fetch(API_BASE);
         const contacts = await res.json();
         renderContacts(contacts);
-    } catch (err) console.error('Failed to load contacts:', err);
+    } catch (err) {
+        console.error('Failed to load contacts:', err);
+    }
 }
 
 async function handleSearch() {
@@ -23,7 +25,9 @@ async function handleSearch() {
     try {
         const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`);
         renderContacts(await res.json());
-    } catch (err) console.error('Search failed:', err);
+    } catch (err) {
+        console.error('Search failed:', err);
+    }
 }
 
 function renderContacts(contacts) {
@@ -69,7 +73,9 @@ form.addEventListener('submit', async (e) => {
         });
         resetForm();
         fetchContacts();
-    } catch (err) console.error('Save failed:', err);
+    } catch (err) {
+        console.error('Save failed:', err);
+    }
 });
 
 async function editContact(id) {
@@ -87,7 +93,9 @@ async function editContact(id) {
         document.getElementById('formTitle').textContent = 'Edit Contact';
         document.getElementById('submitBtn').textContent = 'Update';
         document.getElementById('cancelBtn').style.display = 'inline-block';
-    } catch (err) console.error('Load edit failed:', err);
+    } catch (err) {
+        console.error('Load edit failed:', err);
+    }
 }
 
 document.getElementById('cancelBtn').addEventListener('click', resetForm);
@@ -105,5 +113,7 @@ async function deleteContact(id) {
     try {
         await fetch(`${API_BASE}/${id}`, { method: 'DELETE' });
         fetchContacts();
-    } catch (err) console.error('Delete failed:', err);
+    } catch (err) {
+        console.error('Delete failed:', err);
+    }
 }
