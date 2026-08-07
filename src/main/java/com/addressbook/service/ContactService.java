@@ -1,8 +1,8 @@
 package com.addressbook.service;
 
+import com.addressbook.exception.ResourceNotFoundException;
 import com.addressbook.model.Contact;
 import com.addressbook.repository.ContactRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class ContactService {
     public List<Contact> getAllContacts() { return repository.findAll(); }
 
     public Contact getContactById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Contact not found with ID: " + id));
+        return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Contact not found with ID: " + id));
     }
 
     public Contact createContact(Contact contact) { return repository.save(contact); }
@@ -34,7 +34,7 @@ public class ContactService {
     }
 
     public void deleteContact(Long id) {
-        if (!repository.existsById(id)) throw new EntityNotFoundException("Contact not found with ID: " + id);
+        if (!repository.existsById(id)) throw new ResourceNotFoundException("Contact not found with ID: " + id);
         repository.deleteById(id);
     }
 
