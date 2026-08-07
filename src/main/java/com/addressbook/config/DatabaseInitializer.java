@@ -12,7 +12,6 @@ public class DatabaseInitializer {
     CommandLineRunner initData(ContactRepository repo) {
         return args -> {
             if (repo.count() > 0) return;
-            repo.save(new Contact()); // firstName=John, lastName=Doe...
             // Manually set fields for the 5 seed records
             var c1 = new Contact(); c1.setFirstName("John"); c1.setLastName("Doe"); c1.setEmail("john.doe@example.com"); c1.setPhoneNumber("+1-555-0101"); c1.setAddress("123 Main St, NYC"); c1.setCategory("Family");
             var c2 = new Contact(); c2.setFirstName("Jane"); c2.setLastName("Smith"); c2.setEmail("jane.smith@example.com"); c2.setPhoneNumber("+1-555-0102"); c2.setAddress("456 Oak Ave, LA"); c2.setCategory("Work");
