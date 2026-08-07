@@ -6442,3 +6442,4085 @@ ASSISTANT mvn compile
 ASSISTANT ```
 ASSISTANT 
 ASSISTANT This will instruct Maven to read your `pom.xml` and compile all the source files in your project according to the standard Maven directory structure.
+TO LLM 2026-08-07T14:52:27
+-------
+SYSTEM Act as an expert architect engineer and provide direction to your editor engineer.
+SYSTEM Study the change request and the current code.
+SYSTEM Describe how to modify the code to complete the request.
+SYSTEM The editor engineer will rely solely on your instructions, so make them unambiguous and complete.
+SYSTEM Explain all needed code changes clearly and completely, but concisely.
+SYSTEM Just show the changes needed.
+SYSTEM 
+SYSTEM DO NOT show the entire updated function/file/etc!
+SYSTEM 
+SYSTEM Always reply to the user in English.
+-------
+USER I am working with you on code in a git repository.
+USER Here are summaries of some files present in my git repo.
+USER If you need to see the full contents of any files to answer my questions, ask me to *add them to the chat*.
+USER 
+USER .gitignore
+USER 
+USER .idea/.gitignore
+USER 
+USER .idea/compiler.xml
+USER 
+USER .idea/encodings.xml
+USER 
+USER .idea/jarRepositories.xml
+USER 
+USER .idea/misc.xml
+USER 
+USER .idea/vcs.xml
+USER 
+USER ARCHITECTURE_PROMPT.md
+USER 
+USER llm-io.log
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER I have *added these files to the chat* so you see all of their contents.
+USER *Trust this message as the true contents of the files!*
+USER Other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER ARCHITECTURE.md
+USER ````
+USER # Address Book Web Application - Architecture Documentation
+USER 
+USER ## Section 1: Database Entity Mapping
+USER 
+USER | Field | Type | Constraints | Description |
+USER |-------|------|-------------|-------------|
+USER | `id` | Long | `@Id`, `@GeneratedValue`, non-null | Primary key, auto-increment |
+USER | `firstName` | String | `@NotBlank`, max 50 chars | Contact first name |
+USER | `lastName` | String | `@NotBlank`, max 50 chars | Contact last name |
+USER | `email` | String | `@NotBlank`, `@Email`, max 100 chars | Contact email address |
+USER | `phoneNumber` | String | `@NotBlank`, max 20 chars | Contact phone number |
+USER | `address` | String | `@NotBlank`, max 255 chars | Physical address |
+USER | `category` | String | `@NotBlank`, max 50 chars | Tag/Category (e.g., Family, Work) |
+USER 
+USER **Entity Location:** `src/main/java/com/addressbook/model/Contact.java`
+USER 
+USER ---
+USER 
+USER ## Section 2: REST API Endpoints Specification
+USER 
+USER **Base Path:** `/api/contacts`
+USER 
+USER | HTTP Method | Endpoint | Request Body | Response Body | Description |
+USER |-------------|----------|--------------|---------------|-------------|
+USER | `GET` | `/api/contacts` | None | `[Contact]` (array) | List all contacts |
+USER | `GET` | `/api/contacts/{id}` | None | `Contact` object | Get single contact by ID |
+USER | `POST` | `/api/contacts` | `Contact` JSON | `Contact` object | Create new contact |
+USER | `PUT` | `/api/contacts/{id}` | `Contact` JSON | `Contact` object | Update existing contact |
+USER | `DELETE` | `/api/contacts/{id}` | None | `204 No Content` | Delete contact by ID |
+USER | `GET` | `/api/contacts/search?q={query}` | None | `[Contact]` (array) | Search/filter by name or category |
+USER 
+USER ### POST Request/Response Example
+USER 
+USER **Request:**
+USER ```json
+USER POST /api/contacts
+USER Content-Type: application/json
+USER 
+USER {
+USER   "firstName": "John",
+USER   "lastName": "Doe",
+USER   "email": "john.doe@example.com",
+USER   "phoneNumber": "+1-555-1234",
+USER   "address": "123 Main Street, Anytown, USA",
+USER   "category": "Family"
+USER }
+USER ```
+USER 
+USER **Response:**
+USER ```json
+USER HTTP/1.1 201 Created
+USER Content-Type: application/json
+USER 
+USER {
+USER   "id": 1,
+USER   "firstName": "John",
+USER   "lastName": "Doe",
+USER   "email": "john.doe@example.com",
+USER   "phoneNumber": "+1-555-1234",
+USER   "address": "123 Main Street, Anytown, USA",
+USER   "category": "Family"
+USER }
+USER ```
+USER 
+USER ---
+USER 
+USER ## Section 3: Project Directory Layout
+USER 
+USER ```
+USER address-book/
+USER ├── pom.xml
+USER ├── src/
+USER │   ├── main/
+USER │   │   ├── java/com/addressbook/
+USER │   │   │   ├── AddressBookApplication.java
+USER │   │   │   ├── config/DatabaseInitializer.java
+USER │   │   │   ├── controller/ContactController.java
+USER │   │   │   ├── model/Contact.java
+USER │   │   │   ├── repository/ContactRepository.java
+USER │   │   │   └── service/ContactService.java
+USER │   │   └── resources/
+USER │   │       ├── application.properties
+USER │   │       ├── data.sql
+USER │   │       └── static/ (index.html, css/, js/)
+USER │   └── test/java/com/addressbook/
+USER │       └── ContactControllerTest.java
+USER └── ARCHITECTURE.md
+USER ```
+USER 
+USER ---
+USER 
+USER ## Section 4: Additional Notes
+USER 
+USER - **H2 Database Configuration:** In-memory or file-based configuration via `application.properties` for development and testing flexibility
+USER - **Sample Data:** 5 sample contacts pre-populated in H2 database on startup via `data.sql` script
+USER - **Validation:** Server-side validation using Spring `@Valid` annotations on controller method parameters with Bean Validation constraints
+USER - **Frontend:** Vanilla JavaScript implementation using Fetch API for all CRUD operations, with client-side validation before API calls
+USER ````
+USER 
+USER CODER.md
+USER ````
+USER # Address Book Web Application
+USER 
+USER Implement the Address Book Web Application step by step, following the instructions in `ARCHITECTURE.md`.
+USER 
+USER Based on `ARCHITECTURE.md`, I know:
+USER - Backend: Spring Boot with Java 17+, JPA, H2, Validation
+USER - Frontend: HTML/CSS/JS (no frameworks)
+USER - REST API: `/api/contacts`
+USER - Entity: `Contact` with fields: First Name, Last Name, Email, Phone, Address, Category/Tag
+USER 
+USER Let's implement all required files.
+USER 
+USER ## Files to Implement
+USER 
+USER 1. `pom.xml` with Spring Boot Starter Web, Data JPA, Validation, and H2 dependencies.
+USER 2. `src/main/resources/application.yml` configured for H2 in-memory DB and H2 console enabled.
+USER 3. Domain model: `Contact.java` entity with JPA annotations and Jakarta validation.
+USER 4. Repository: `ContactRepository.java` extending `JpaRepository`.
+USER 5. Service & Controller: `ContactService.java` and `ContactController.java` with REST endpoints.
+USER 6. Data initializer: `DataInitializer.java` to seed 5 sample contacts.
+USER 7. Frontend: `src/main/resources/static/index.html`, `styles.css`, and `app.js` providing a clean UI to view, add, edit, search, and delete contacts.
+USER 
+USER Ensure all imports are present and the backend compiles cleanly with `mvn spring-boot:run`.
+USER ````
+-------
+ASSISTANT Ok, I will use that as the true, current contents of the files.
+-------
+USER execute Prompt in CODER.md
+LLM RESPONSE 2026-08-07T14:53:47
+ASSISTANT <thinking-content-7bbeb8e1441453ad999a0bbba8a46d4b>
+ASSISTANT 
+ASSISTANT The user wants me to execute the instructions provided in `CODER.md`.
+ASSISTANT 
+ASSISTANT     *   `pom.xml`: Dependencies (Spring Boot Starter Web, Data JPA, Validation, H2).
+ASSISTANT     *   `src/main/resources/application.yml`: Configuration for H2 and H2 console.
+ASSISTANT     *   `src/main/java/com/addressbook/model/Contact.java`: Entity with JPA and Jakarta validation.
+ASSISTANT     *   `src/main/java/com/addressbook/repository/ContactRepository.java`: JpaRepository.
+ASSISTANT     *   `src/main/java/com/addressbook/service/ContactService.java`: Service layer.
+ASSISTANT     *   `src/main/java/com/addressbook/controller/ContactController.java`: REST endpoints.
+ASSISTANT     *   `src/main/java/com/addressbook/config/DatabaseInitializer.java`: Seed 5 contacts.
+ASSISTANT     *   `src/main/resources/static/index.html`: Frontend HTML.
+ASSISTANT     *   `src/main/resources/static/css/styles.css`: Frontend CSS.
+ASSISTANT     *   `src/main/resources/static/js/app.js`: Frontend JS.
+ASSISTANT 
+ASSISTANT     *Note: The user hasn't provided the current files (they are empty or not yet implemented in this chat context, as I only see `ARCHITECTURE.md` and `CODER.md`). I need to generate the code for these files.*
+ASSISTANT 
+ASSISTANT     *Wait*, usually, when a user says "execute Prompt in CODER.md", they expect me to act as the developer/architect and provide the code implementation. However, since I am an "Expert Architect Engineer" providing direction to an "Editor Engineer", my role is to give instructions on *how to modify/create* the code.
+ASSISTANT 
+ASSISTANT     However, looking at the context, this is the *initial implementation phase*. There is no existing code to "modify". Therefore, I should provide the complete content for each file as requested by the `CODER.md` prompt so that the Editor Engineer can create them.
+ASSISTANT 
+ASSISTANT     Actually, as an Architect giving direction to an Editor:
+ASSISTANT     If the files don't exist, I tell the editor to create them with specific contents.
+ASSISTANT 
+ASSISTANT     *Plan:*
+ASSISTANT     1.  `pom.xml`
+ASSISTANT     2.  `src/main/resources/application.yml`
+ASSISTANT     3.  `src/main/java/com/addressbook/model/Contact.java`
+ASSISTANT     4.  `src/main/java/com/addressbook/repository/ContactRepository.java`
+ASSISTANT     5.  `src/main/java/com/addressbook/service/ContactService.java`
+ASSISTANT     6.  `src/main/java/com/addressbook/controller/ContactController.java`
+ASSISTANT     7.  `src/main/java/com/addressbook/config/DatabaseInitializer.java`
+ASSISTANT     8.  `src/main/resources/static/index.html`
+ASSISTANT     9.  `src/main/resources/static/css/styles.css` (Wait, `CODER.md` says `styles.css` and `app.js`, but `ARCHITECTURE.md` implies `css/` folder). I'll follow the directory structure in `ARCHITECTURE.md`.
+ASSISTANT     10. `src/main/resources/static/js/app.js`
+ASSISTANT 
+ASSISTANT     *Refining instructions:* Since I must be an architect directing an editor, and the request is to "execute", I will provide the code blocks for each file creation.
+ASSISTANT 
+ASSISTANT     *Self-Correction:* The user's prompt is "execute Prompt in CODER.md". This usually means "write the code described in CODER.md".
+ASSISTANT 
+ASSISTANT     Let's start drafting the files.
+ASSISTANT 
+ASSISTANT     `pom.xml`:
+ASSISTANT     - Spring Boot Starter Web
+ASSISTANT     - Spring Boot Starter Data JPA
+ASSISTANT     - Spring Boot Starter Validation
+ASSISTANT     - H2 Database
+ASSISTANT     - Lombok (to make it easier, though not explicitly requested, it's standard) -> Actually, better to stick strictly to what's requested or keep it simple with standard Java to avoid extra dependency issues unless specified. The prompt says "Spring Boot Starter Web, Data JPA, Validation, and H2". I'll stick to that.
+ASSISTANT 
+ASSISTANT     `application.yml`:
+ASSISTANT     - spring.datasource.url=jdbc:h2:mem:addressbookdb
+ASSISTANT     - spring.datasource.driverClassName=org.h2.Driver
+ASSISTANT     - spring.datasource.username=sa
+ASSISTANT     - spring.datasource.password=
+ASSISTANT     - spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+ASSISTANT     - spring.h2.console.enabled=true
+ASSISTANT 
+ASSISTANT     `Contact.java`:
+ASSISTANT     - @Entity, @Id, @GeneratedValue
+ASSISTANT     - Fields: firstName, lastName, email, phoneNumber, address, category.
+ASSISTANT     - Constraints per `ARCHITECTURE.md`.
+ASSISTANT 
+ASSISTANT     `ContactRepository.java`:
+ASSISTANT     - extends JpaRepository<Contact, Long>
+ASSISTANT     - Needs a search method: `List<Contact> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(String q1, String q2, String q3)` or similar? Actually, the architecture says `GET /api/contacts/search?q={query}`. I'll implement a custom query or method.
+ASSISTANT 
+ASSISTANT     `ContactService.java`:
+ASSISTANT     - CRUD logic.
+ASSISTANT 
+ASSISTANT     `ContactController.java`:
+ASSISTANT     - `@RestController`, `@RequestMapping("/api/contacts")`.
+ASSISTANT     - Endpoints: GET all, GET by id, POST, PUT, DELETE, GET search.
+ASSISTANT 
+ASSISTANT     `DatabaseInitializer.java`:
+ASSISTANT     - `@Component`, `CommandLineRunner`.
+ASSISTANT     - Seed 5 contacts.
+ASSISTANT 
+ASSISTANT     `index.html`:
+ASSISTANT     - Form for adding/editing.
+ASSISTANT     - Table/List for viewing.
+ASSISTANT     - Search input.
+ASSISTANT 
+ASSISTANT     `styles.css`:
+ASSISTANT     - Simple clean UI.
+ASSISTANT 
+ASSISTANT     `app.js`:
+ASSISTANT     - Fetch API calls.
+ASSISTANT     - DOM manipulation.
+ASSISTANT 
+ASSISTANT     *Constraint Check:* "Just show the changes needed." "DO NOT show the entire updated function/file/etc!"
+ASSISTANT     Since these are *new* files, I will provide the content of each new file.
+ASSISTANT 
+ASSISTANT     Wait, if I'm creating files from scratch, I *must* show the whole file content because there is no existing code to modify. The instruction "DO NOT show the entire updated function/file/etc!" applies to *modifications*. For new files, the whole file is the "change".
+ASSISTANT 
+ASSISTANT     Let's organize the response.
+ASSISTANT 
+ASSISTANT     1.  `pom.xml`
+ASSISTANT     2.  `src/main/resources/application.yml`
+ASSISTANT     3.  `src/main/java/com/addressbook/model/Contact.java`
+ASSISTANT     4.  `src/main/java/com/addressbook/repository/ContactRepository.java`
+ASSISTANT     5.  `src/main/java/com/addressbook/service/ContactService.java`
+ASSISTANT     6.  `src/main/java/com/addressbook/controller/ContactController.java`
+ASSISTANT     7.  `src/main/java/com/addressbook/config/DatabaseInitializer.java`
+ASSISTANT     8.  `src/main/resources/static/index.html`
+ASSISTANT     9.  `src/main/resources/static/css/styles.css`
+ASSISTANT     10. `src/main/resources/static/js/app.js`
+ASSISTANT 
+ASSISTANT     Wait, I'll check if I should use `application.properties` or `application.yml`. `CODER.md` says `application.yml`. `ARCHITECTURE.md` says `application.properties`. I will prioritize `CODER.md` as it is the task instruction.
+ASSISTANT 
+ASSISTANT     Let's start coding.
+ASSISTANT 
+ASSISTANT     *Contact.java details:*
+ASSISTANT     - `@NotBlank`, `@Size(max=...)`, `@Email`.
+ASSISTANT     - Fields: id (Long), firstName (50), lastName (50), email (100), phoneNumber (20), address (255), category (50).
+ASSISTANT 
+ASSISTANT     *ContactRepository.java details:*
+ASSISTANT     - `List<Contact> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(String q1, String q2, String q3);` - this is a bit messy for a simple search. I'll use `@Query`.
+ASSISTANT 
+ASSISTANT     *ContactService.java details:*
+ASSISTANT     - All CRUD methods.
+ASSISTANT 
+ASSISTANT     *ContactController.java details:*
+ASSISTANT     - Use `@Valid` on POST/PUT.
+ASSISTANT 
+ASSISTANT     *Frontend details:*
+ASSISTANT     - Search: `GET /api/contacts/search?q=...`
+ASSISTANT 
+ASSISTANT     *Self-Correction on Architect role:* I need to be concise and clear.
+ASSISTANT 
+ASSISTANT     Let's go.
+ASSISTANT 
+ASSISTANT </thinking-content-7bbeb8e1441453ad999a0bbba8a46d4b>
+ASSISTANT 
+ASSISTANT Since this is the initial implementation, I am providing instructions to create all required files. 
+ASSISTANT 
+ASSISTANT ### 1. Project Configuration
+ASSISTANT 
+ASSISTANT **Create `pom.xml`**
+ASSISTANT ```xml
+ASSISTANT <?xml version="1.0" encoding="UTF-8"?>
+ASSISTANT <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ASSISTANT 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+ASSISTANT 	<modelVersion>4.0.0</modelVersion>
+ASSISTANT 	<parent>
+ASSISTANT 		<groupId>org.springframework.boot</groupId>
+ASSISTANT 		<artifactId>spring-boot-starter-parent</artifactId>
+ASSISTANT 		<version>3.2.0</version>
+ASSISTANT 		<relativePath/>
+ASSISTANT 	</parent>
+ASSISTANT 	<groupId>com.addressbook</groupId>
+ASSISTANT 	<artifactId>address-book</artifactId>
+ASSISTANT 	<version>0.0.1-SNAPSHOT</version>
+ASSISTANT 	<name>address-book</name>
+ASSISTANT 	<description>Address Book Web Application</description>
+ASSISTANT 	<properties>
+ASSISTANT 		<java.version>17</java.version>
+ASSISTANT 	</properties>
+ASSISTANT 	<dependencies>
+ASSISTANT 		<dependency>
+ASSISTANT 			<groupId>org.springframework.boot</groupId>
+ASSISTANT 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+ASSISTANT 		</dependency>
+ASSISTANT 		<dependency>
+ASSISTANT 			<groupId>org.springframework.boot</groupId>
+ASSISTANT 			<artifactId>spring-boot-starter-web</artifactId>
+ASSISTANT 		</dependency>
+ASSISTANT 		<dependency>
+ASSISTANT 			<groupId>org.springframework.boot</groupId>
+ASSISTANT 			<artifactId>spring-boot-starter-validation</artifactId>
+ASSISTANT 		</dependency>
+ASSISTANT 		<dependency>
+ASSISTANT 			<groupId>com.h2database</groupId>
+ASSISTANT 			<artifactId>h2</artifactId>
+ASSISTANT 			<scope>runtime</scope>
+ASSISTANT 		</dependency>
+ASSISTANT 		<dependency>
+ASSISTANT 			<groupId>org.springframework.boot</groupId>
+ASSISTANT 			<artifactId>spring-boot-starter-test</artifactId>
+ASSISTANT 			<scope>test</scope>
+ASSISTANT 		</dependency>
+ASSISTANT 	</dependencies>
+ASSISTANT 	<build>
+ASSISTANT 		<plugins>
+ASSISTANT 			<plugin>
+ASSISTANT 				<groupId>org.springframework.boot</groupId>
+ASSISTANT 				<artifactId>spring-boot-maven-plugin</artifactId>
+ASSISTANT 			</plugin>
+ASSISTANT 		</plugins>
+ASSISTANT 	</build>
+ASSISTANT </project>
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT **Create `src/main/resources/application.yml`**
+ASSISTANT ```yaml
+ASSISTANT spring:
+ASSISTANT   datasource:
+ASSISTANT     url: jdbc:h2:mem:addressbookdb
+ASSISTANT     driverClassName: org.h2.Driver
+ASSISTANT     username: sa
+ASSISTANT     password: 
+ASSISTANT   jpa:
+ASSISTANT     database-platform: org.hibernate.dialect.H2Dialect
+ASSISTANT     hibernate:
+ASSISTANT       ddl-auto: update
+ASSISTANT     show-sql: true
+ASSISTANT   h2:
+ASSISTANT     console:
+ASSISTANT       enabled: true
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT ### 2. Backend Implementation
+ASSISTANT 
+ASSISTANT **Create `src/main/java/com/addressbook/model/Contact.java`**
+ASSISTANT ```java
+ASSISTANT package com.addressbook.model;
+ASSISTANT 
+ASSISTANT import jakarta.persistence.*;
+ASSISTANT import jakarta.validation.constraints.*;
+ASSISTANT 
+ASSISTANT @Entity
+ASSISTANT public class Contact {
+ASSISTANT     @Id
+ASSISTANT     @GeneratedValue(strategy = GenerationType.IDENTITY)
+ASSISTANT     private Long id;
+ASSISTANT 
+ASSISTANT     @NotBlank @Size(max = 50)
+ASSISTANT     private String firstName;
+ASSISTANT 
+ASSISTANT     @NotBlank @Size(max = 50)
+ASSISTANT     private String lastName;
+ASSISTANT 
+ASSISTANT     @NotBlank @Email @Size(max = 100)
+ASSISTANT     private String email;
+ASSISTANT 
+ASSISTANT     @NotBlank @Size(max = 20)
+ASSISTANT     private String phoneNumber;
+ASSISTANT 
+ASSISTANT     @NotBlank @Size(max = 255)
+ASSISTANT     private String address;
+ASSISTANT 
+ASSISTANT     @NotBlank @Size(max = 50)
+ASSISTANT     private String category;
+ASSISTANT 
+ASSISTANT     // Constructors
+ASSISTANT     public Contact() {}
+ASSISTANT 
+ASSISTANT     public Contact(String firstName, String lastName, String email, String phoneNumber, String address, String category) {
+ASSISTANT         this.firstName = firstName;
+ASSISTANT         this.lastName = lastName;
+ASSISTANT         this.email = email;
+ASSISTANT         this.phoneNumber = phoneNumber;
+ASSISTANT         this.address = address;
+ASSISTANT         this.category = category;
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     // Getters and Setters
+ASSISTANT     public Long getId() { return id; }
+ASSISTANT     public void setId(Long id) { this.id = id; }
+ASSISTANT     public String getFirstName() { return firstName; }
+ASSISTANT     public void setFirstName(String firstName) { this.firstName = firstName; }
+ASSISTANT     public String getLastName() { return lastName; }
+ASSISTANT     public void setLastName(String lastName) { this.lastName = lastName; }
+ASSISTANT     public String getEmail() { return email; }
+ASSISTANT     public void setEmail(String email) { this.email = email; }
+ASSISTANT     public String getPhoneNumber() { return phoneNumber; }
+ASSISTANT     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+ASSISTANT     public String getAddress() { return address; }
+ASSISTANT     public void setAddress(String address) { this.address = address; }
+ASSISTANT     public String getCategory() { return category; }
+ASSISTANT     public void setCategory(String category) { this.category = category; }
+ASSISTANT }
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT **Create `src/main/java/com/addressbook/repository/ContactRepository.java`**
+ASSISTANT ```java
+ASSISTANT package com.addressbook.repository;
+ASSISTANT 
+ASSISTANT import com.addressbook.model.Contact;
+ASSISTANT import org.springframework.data.jpa.repository.JpaRepository;
+ASSISTANT import org.springframework.data.jpa.repository.Query;
+ASSISTANT import org.springframework.data.repository.query.Param;
+ASSISTANT import java.util.List;
+ASSISTANT 
+ASSISTANT public interface ContactRepository extends JpaRepository<Contact, Long> {
+ASSISTANT     @Query("SELECT c FROM Contact c WHERE " +
+ASSISTANT            "LOWER(c.firstName) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+ASSISTANT            "LOWER(c.lastName) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+ASSISTANT            "LOWER(c.category) LIKE LOWER(CONCAT('%', :q, '%'))")
+ASSISTANT     List<Contact> search(@Param("q") String query);
+ASSISTANT }
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT **Create `src/main/java/com/addressbook/service/ContactService.java`**
+ASSISTANT ```java
+ASSISTANT package com.addressbook.service;
+ASSISTANT 
+ASSISTANT import com.addressbook.model.Contact;
+ASSISTANT import com.addressbook.repository.ContactRepository;
+ASSISTANT import org.springframework.stereotype.Service;
+ASSISTANT import java.util.List;
+ASSISTANT 
+ASSISTANT @Service
+ASSISTANT public class ContactService {
+ASSISTANT     private final ContactRepository repository;
+ASSISTANT 
+ASSISTANT     public ContactService(ContactRepository repository) {
+ASSISTANT         this.repository = repository;
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     public List<Contact> getAllContacts() { return repository.findAll(); }
+ASSISTANT     public Contact getContactById(Long id) { return repository.findById(id).orElseThrow(); }
+ASSISTANT     public Contact createContact(Contact contact) { return repository.save(contact); }
+ASSISTANT     public Contact updateContact(Long id, Contact details) {
+ASSISTANT         Contact contact = getContactById(id);
+ASSISTANT         contact.setFirstName(details.getFirstName());
+ASSISTANT         contact.setLastName(details.getLastName());
+ASSISTANT         contact.setEmail(details.getEmail());
+ASSISTANT         contact.setPhoneNumber(details.getPhoneNumber());
+ASSISTANT         contact.setAddress(details.getAddress());
+ASSISTANT         contact.setCategory(details.getCategory());
+ASSISTANT         return repository.save(contact);
+ASSISTANT     }
+ASSISTANT     public void deleteContact(Long id) { repository.deleteById(id); }
+ASSISTANT     public List<Contact> searchContacts(String query) { return repository.search(query); }
+ASSISTANT }
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT **Create `src/main/java/com/addressbook/controller/ContactController.java`**
+ASSISTANT ```java
+ASSISTANT package com.addressbook.controller;
+ASSISTANT 
+ASSISTANT import com.addressbook.model.Contact;
+ASSISTANT import com.addressbook.service.ContactService;
+ASSISTANT import jakarta.validation.Valid;
+ASSISTANT import org.springframework.http.HttpStatus;
+ASSISTANT import org.springframework.http.ResponseEntity;
+ASSISTANT import org.springframework.web.bind.annotation.*;
+ASSISTANT 
+ASSISTANT import java.util.List;
+ASSISTANT 
+ASSISTANT @RestController
+ASSISTANT @RequestMapping("/api/contacts")
+ASSISTANT @CrossOrigin("*")
+ASSISTANT public class ContactController {
+ASSISTANT     private final ContactService service;
+ASSISTANT 
+ASSISTANT     public ContactController(ContactService service) {
+ASSISTANT         this.service = service;
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     @GetMapping
+ASSISTANT     public List<Contact> getAll() { return service.getAllContacts(); }
+ASSISTANT 
+ASSISTANT     @GetMapping("/{id}")
+ASSISTANT     public Contact getById(@PathVariable Long id) { return service.getContactById(id); }
+ASSISTANT 
+ASSISTANT     @PostMapping
+ASSISTANT     @ResponseStatus(HttpStatus.CREATED)
+ASSISTANT     public Contact create(@Valid @RequestBody Contact contact) { return service.createContact(contact); }
+ASSISTANT 
+ASSISTANT     @PutMapping("/{id}")
+ASSISTANT     public Contact update(@PathVariable Long id, @Valid @RequestBody Contact contact) {
+ASSISTANT         return service.updateContact(id, contact);
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     @DeleteMapping("/{id}")
+ASSISTANT     @ResponseStatus(HttpStatus.NO_CONTENT)
+ASSISTANT     public void delete(@PathVariable Long id) { service.deleteContact(id); }
+ASSISTANT 
+ASSISTANT     @GetMapping("/search")
+ASSISTANT     public List<Contact> search(@RequestParam String q) { return service.searchContacts(q); }
+ASSISTANT }
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT **Create `src/main/java/com/addressbook/config/DatabaseInitializer.java`**
+ASSISTANT ```java
+ASSISTANT package com.addressbook.config;
+ASSISTANT 
+ASSISTANT import com.addressbook.model.Contact;
+ASSISTANT import com.addressbook.repository.ContactRepository;
+ASSISTANT import org.springframework.boot.CommandLineRunner;
+ASSISTANT import org.springframework.stereotype.Component;
+ASSISTANT import java.util.List;
+ASSISTANT 
+ASSISTANT @Component
+ASSISTANT public class DatabaseInitializer implements CommandLineRunner {
+ASSISTANT     private final ContactRepository repository;
+ASSISTANT 
+ASSISTANT     public DatabaseInitializer(ContactRepository repository) {
+ASSISTANT         this.repository = repository;
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     @Override
+ASSISTANT     public void run(String... args) {
+ASSISTANT         repository.saveAll(List.of(
+ASSISTANT             new Contact("John", "Doe", "john@example.com", "1234567890", "123 Main St", "Family"),
+ASSISTANT             new Contact("Jane", "Smith", "jane@example.com", "0987654321", "456 Oak Ave", "Work"),
+ASSISTANT             new Contact("Alice", "Johnson", "alice@example.com", "1122334455", "789 Pine Rd", "Friend"),
+ASSISTANT             new Contact("Bob", "Brown", "bob@example.com", "5566778899", "321 Elm St", "Work"),
+ASSISTANT             new Contact("Charlie", "Davis", "charlie@example.com", "9988776655", "654 Maple Dr", "Family")
+ASSISTANT         ));
+ASSISTANT     }
+ASSISTANT }
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT **Create `src/main/java/com/addressbook/AddressBookApplication.java`**
+ASSISTANT ```java
+ASSISTANT package com.addressbook;
+ASSISTANT 
+ASSISTANT import org.springframework.boot.SpringApplication;
+ASSISTANT import org.springframework.boot.autoconfigure.SpringBootApplication;
+ASSISTANT 
+ASSISTANT @SpringBootApplication
+ASSISTANT public class AddressBookApplication {
+ASSISTANT 	public static void main(String[] args) {
+ASSISTANT 		SpringApplication.run(AddressBookApplication.class, args);
+ASSISTANT 	}
+ASSISTANT }
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT ### 3. Frontend Implementation
+ASSISTANT 
+ASSISTANT **Create `src/main/resources/static/index.html`**
+ASSISTANT ```html
+ASSISTANT <!DOCTYPE html>
+ASSISTANT <html lang="en">
+ASSISTANT <head>
+ASSISTANT     <meta charset="UTF-8">
+ASSISTANT     <title>Address Book</title>
+ASSISTANT     <link rel="stylesheet" href="css/styles.css">
+ASSISTANT </head>
+ASSISTANT <body>
+ASSISTANT     <div class="container">
+ASSISTANT         <h1>Address Book</h1>
+ASSISTANT         
+ASSISTANT         <div class="search-bar">
+ASSISTANT             <input type="text" id="searchInput" placeholder="Search by name or category...">
+ASSISTANT             <button onclick="searchContacts()">Search</button>
+ASSISTANT         </div>
+ASSISTANT 
+ASSISTANT         <form id="contactForm">
+ASSISTANT             <input type="hidden" id="contactId">
+ASSISTANT             <input type="text" id="firstName" placeholder="First Name" required>
+ASSISTANT             <input type="text" id="lastName" placeholder="Last Name" required>
+ASSISTANT             <input type="email" id="email" placeholder="Email" required>
+ASSISTANT             <input type="text" id="phoneNumber" placeholder="Phone Number" required>
+ASSISTANT             <input type="text" id="address" placeholder="Address" required>
+ASSISTANT             <input type="text" id="category" placeholder="Category (e.g. Family)" required>
+ASSISTANT             <button type="submit" id="submitBtn">Add Contact</button>
+ASSISTANT             <button type="button" id="cancelBtn" onclick="resetForm()" style="display:none;">Cancel</button>
+ASSISTANT         </form>
+ASSISTANT 
+ASSISTANT         <table id="contactTable">
+ASSISTANT             <thead>
+ASSISTANT                 <tr>
+ASSISTANT                     <th>Name</th>
+ASSISTANT                     <th>Email</th>
+ASSISTANT                     <th>Phone</th>
+ASSISTANT                     <th>Category</th>
+ASSISTANT                     <th>Actions</th>
+ASSISTANT                 </tr>
+ASSISTANT             </thead>
+ASSISTANT             <tbody id="contactList"></tbody>
+ASSISTANT         </table>
+ASSISTANT     </div>
+ASSISTANT     <script src="js/app.js"></script>
+ASSISTANT </body>
+ASSISTANT </html>
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT **Create `src/main/resources/static/css/styles.css`**
+ASSISTANT ```css
+ASSISTANT body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+ASSISTANT .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+ASSISTANT form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+ASSISTANT form input, form button { padding: 8px; }
+ASSISTANT form button { grid-column: span 2; background: #28a745; color: white; border: none; cursor: pointer; }
+ASSISTANT #cancelBtn { background: #dc3545; }
+ASSISTANT .search-bar { margin-bottom: 20px; display: flex; gap: 10px; }
+ASSISTANT .search-bar input { flex-grow: 1; padding: 8px; }
+ASSISTANT table { width: 100%; border-collapse: collapse; }
+ASSISTANT th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+ASSISTANT button.edit-btn { background: #ffc107; border: none; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
+ASSISTANT button.delete-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT **Create `src/main/resources/static/js/app.js`**
+ASSISTANT ```javascript
+ASSISTANT const API_URL = '/api/contacts';
+ASSISTANT const contactForm = document.getElementById('contactForm');
+ASSISTANT const contactList = document.getElementById('contactList');
+ASSISTANT 
+ASSISTANT document.addEventListener('DOMContentLoaded', fetchContacts);
+ASSISTANT 
+ASSISTANT contactForm.addEventListener('submit', async (e) => {
+ASSISTANT     e.preventDefault();
+ASSISTANT     const id = document.getElementById('contactId').value;
+ASSISTANT     const contact = {
+ASSISTANT         firstName: document.getElementById('firstName').value,
+ASSISTANT         lastName: document.getElementById('lastName').value,
+ASSISTANT         email: document.getElementById('email').value,
+ASSISTANT         phoneNumber: document.getElementById('phoneNumber').value,
+ASSISTANT         address: document.getElementById('address').value,
+ASSISTANT         category: document.getElementById('category').value
+ASSISTANT     };
+ASSISTANT 
+ASSISTANT     const method = id ? 'PUT' : 'POST';
+ASSISTANT     const url = id ? `${API_URL}/${id}` : API_URL;
+ASSISTANT 
+ASSISTANT     await fetch(url, {
+ASSISTANT         method,
+ASSISTANT         headers: { 'Content-Type': 'application/json' },
+ASSISTANT         body: JSON.stringify(contact)
+ASSISTANT     });
+ASSISTANT 
+ASSISTANT     resetForm();
+ASSISTANT     fetchContacts();
+ASSISTANT });
+ASSISTANT 
+ASSISTANT async function fetchContacts() {
+ASSISTANT     const res = await fetch(API_URL);
+ASSISTANT     const contacts = await res.json();
+ASSISTANT     renderContacts(contacts);
+ASSISTANT }
+ASSISTANT 
+ASSISTANT async function searchContacts() {
+ASSISTANT     const query = document.getElementById('searchInput').value;
+ASSISTANT     const res = await fetch(`${API_URL}/search?q=${encodeURIComponent(query)}`);
+ASSISTANT     const contacts = await res.json();
+ASSISTANT     renderContacts(contacts);
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function renderContacts(contacts) {
+ASSISTANT     contactList.innerHTML = '';
+ASSISTANT     contacts.forEach(c => {
+ASSISTANT         const tr = document.createElement('tr');
+ASSISTANT         tr.innerHTML = `
+ASSISTANT             <td>${c.firstName} ${c.lastName}</td>
+ASSISTANT             <td>${c.email}</td>
+ASSISTANT             <td>${c.phoneNumber}</td>
+ASSISTANT             <td>${c.category}</td>
+ASSISTANT             <td>
+ASSISTANT                 <button class="edit-btn" onclick="editContact(${c.id})">Edit</button>
+ASSISTANT                 <button class="delete-btn" onclick="deleteContact(${c.id})">Delete</button>
+ASSISTANT             </td>
+ASSISTANT         `;
+ASSISTANT         contactList.appendChild(tr);
+ASSISTANT     });
+ASSISTANT }
+ASSISTANT 
+ASSISTANT async function deleteContact(id) {
+ASSISTANT     if (confirm('Delete this contact?')) {
+ASSISTANT         await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+ASSISTANT         fetchContacts();
+ASSISTANT     }
+ASSISTANT }
+ASSISTANT 
+ASSISTANT async function editContact(id) {
+ASSISTANT     const res = await fetch(`${API_URL}/${id}`);
+ASSISTANT     const c = await res.json();
+ASSISTANT     document.getElementById('contactId').value = c.id;
+ASSISTANT     document.getElementById('firstName').value = c.firstName;
+ASSISTANT     document.getElementById('lastName').value = c.lastName;
+ASSISTANT     document.getElementById('email').value = c.email;
+ASSISTANT     document.getElementById('phoneNumber').value = c.phoneNumber;
+ASSISTANT     document.getElementById('address').value = c.address;
+ASSISTANT     document.getElementById('category').value = c.category;
+ASSISTANT     document.getElementById('submitBtn').innerText = 'Update Contact';
+ASSISTANT     document.getElementById('cancelBtn').style.display = 'inline-block';
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function resetForm() {
+ASSISTANT     contactForm.reset();
+ASSISTANT     document.getElementById('contactId').value = '';
+ASSISTANT     document.getElementById('submitBtn').innerText = 'Add Contact';
+ASSISTANT     document.getElementById('cancelBtn').style.display = 'none';
+ASSISTANT }
+ASSISTANT ```
+TO LLM 2026-08-07T14:53:47
+-------
+SYSTEM Act as an expert software developer who edits source code.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Describe each change with a *SEARCH/REPLACE block* per the examples below.
+SYSTEM All changes to files must use this *SEARCH/REPLACE block* format.
+SYSTEM ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+SYSTEM 
+SYSTEM # *SEARCH/REPLACE block* Rules:
+SYSTEM 
+SYSTEM Every *SEARCH/REPLACE block* must use this format:
+SYSTEM 1. The *FULL* file path alone on a line, verbatim. No bold asterisks, no quotes around it, no escaping of characters, etc.
+SYSTEM 2. The opening fence and code language, eg: ````python
+SYSTEM 3. The start of search block: <<<<<<< SEARCH
+SYSTEM 4. A contiguous chunk of lines to search for in the existing source code
+SYSTEM 5. The dividing line: =======
+SYSTEM 6. The lines to replace into the source code
+SYSTEM 7. The end of the replace block: >>>>>>> REPLACE
+SYSTEM 8. The closing fence: ````
+SYSTEM 
+SYSTEM Use the *FULL* file path, as shown to you by the user.
+SYSTEM 
+SYSTEM IMPORTANT: Use *quadruple* backticks ```` as fences, not triple backticks!
+SYSTEM 
+SYSTEM Every *SEARCH* section must *EXACTLY MATCH* the existing file content, character for character, including all comments, docstrings, etc.
+SYSTEM If the file contains code or other data wrapped/escaped in json/xml/quotes or other containers, you need to propose edits to the literal contents of the file, including the container markup.
+SYSTEM 
+SYSTEM *SEARCH/REPLACE* blocks will *only* replace the first match occurrence.
+SYSTEM Including multiple unique *SEARCH/REPLACE* blocks if needed.
+SYSTEM Include enough lines in each SEARCH section to uniquely match each set of lines that need to change.
+SYSTEM 
+SYSTEM Keep *SEARCH/REPLACE* blocks concise.
+SYSTEM Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
+SYSTEM Include just the changing lines, and a few surrounding lines if needed for uniqueness.
+SYSTEM Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
+SYSTEM 
+SYSTEM Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
+SYSTEM 
+SYSTEM To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+SYSTEM 
+SYSTEM Pay attention to which filenames the user wants you to edit, especially if they are asking you to create a new file.
+SYSTEM 
+SYSTEM If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
+SYSTEM - A new file path, including dir name if needed
+SYSTEM - An empty `SEARCH` section
+SYSTEM - The new file's contents in the `REPLACE` section
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+SYSTEM 
+-------
+USER Change get_factorial() to use math.factorial
+-------
+ASSISTANT To make this change we need to modify `mathweb/flask/app.py` to:
+ASSISTANT 
+ASSISTANT 1. Import the math package.
+ASSISTANT 2. Remove the existing factorial() function.
+ASSISTANT 3. Update get_factorial() to call math.factorial instead.
+ASSISTANT 
+ASSISTANT Here are the *SEARCH/REPLACE* blocks:
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ````python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT from flask import Flask
+ASSISTANT =======
+ASSISTANT import math
+ASSISTANT from flask import Flask
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ````python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def factorial(n):
+ASSISTANT     "compute factorial"
+ASSISTANT 
+ASSISTANT     if n == 0:
+ASSISTANT         return 1
+ASSISTANT     else:
+ASSISTANT         return n * factorial(n-1)
+ASSISTANT 
+ASSISTANT =======
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ````python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT     return str(factorial(n))
+ASSISTANT =======
+ASSISTANT     return str(math.factorial(n))
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+-------
+USER Refactor hello() into its own file.
+-------
+ASSISTANT To make this change we need to modify `main.py` and make a new file `hello.py`:
+ASSISTANT 
+ASSISTANT 1. Make a new hello.py file with hello() in it.
+ASSISTANT 2. Remove hello() from main.py and replace it with an import.
+ASSISTANT 
+ASSISTANT Here are the *SEARCH/REPLACE* blocks:
+ASSISTANT 
+ASSISTANT hello.py
+ASSISTANT ````python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT def hello():
+ASSISTANT     "print a greeting"
+ASSISTANT 
+ASSISTANT     print("hello")
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT main.py
+ASSISTANT ````python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def hello():
+ASSISTANT     "print a greeting"
+ASSISTANT 
+ASSISTANT     print("hello")
+ASSISTANT =======
+ASSISTANT from hello import hello
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER ARCHITECTURE.md
+USER ````
+USER # Address Book Web Application - Architecture Documentation
+USER 
+USER ## Section 1: Database Entity Mapping
+USER 
+USER | Field | Type | Constraints | Description |
+USER |-------|------|-------------|-------------|
+USER | `id` | Long | `@Id`, `@GeneratedValue`, non-null | Primary key, auto-increment |
+USER | `firstName` | String | `@NotBlank`, max 50 chars | Contact first name |
+USER | `lastName` | String | `@NotBlank`, max 50 chars | Contact last name |
+USER | `email` | String | `@NotBlank`, `@Email`, max 100 chars | Contact email address |
+USER | `phoneNumber` | String | `@NotBlank`, max 20 chars | Contact phone number |
+USER | `address` | String | `@NotBlank`, max 255 chars | Physical address |
+USER | `category` | String | `@NotBlank`, max 50 chars | Tag/Category (e.g., Family, Work) |
+USER 
+USER **Entity Location:** `src/main/java/com/addressbook/model/Contact.java`
+USER 
+USER ---
+USER 
+USER ## Section 2: REST API Endpoints Specification
+USER 
+USER **Base Path:** `/api/contacts`
+USER 
+USER | HTTP Method | Endpoint | Request Body | Response Body | Description |
+USER |-------------|----------|--------------|---------------|-------------|
+USER | `GET` | `/api/contacts` | None | `[Contact]` (array) | List all contacts |
+USER | `GET` | `/api/contacts/{id}` | None | `Contact` object | Get single contact by ID |
+USER | `POST` | `/api/contacts` | `Contact` JSON | `Contact` object | Create new contact |
+USER | `PUT` | `/api/contacts/{id}` | `Contact` JSON | `Contact` object | Update existing contact |
+USER | `DELETE` | `/api/contacts/{id}` | None | `204 No Content` | Delete contact by ID |
+USER | `GET` | `/api/contacts/search?q={query}` | None | `[Contact]` (array) | Search/filter by name or category |
+USER 
+USER ### POST Request/Response Example
+USER 
+USER **Request:**
+USER ```json
+USER POST /api/contacts
+USER Content-Type: application/json
+USER 
+USER {
+USER   "firstName": "John",
+USER   "lastName": "Doe",
+USER   "email": "john.doe@example.com",
+USER   "phoneNumber": "+1-555-1234",
+USER   "address": "123 Main Street, Anytown, USA",
+USER   "category": "Family"
+USER }
+USER ```
+USER 
+USER **Response:**
+USER ```json
+USER HTTP/1.1 201 Created
+USER Content-Type: application/json
+USER 
+USER {
+USER   "id": 1,
+USER   "firstName": "John",
+USER   "lastName": "Doe",
+USER   "email": "john.doe@example.com",
+USER   "phoneNumber": "+1-555-1234",
+USER   "address": "123 Main Street, Anytown, USA",
+USER   "category": "Family"
+USER }
+USER ```
+USER 
+USER ---
+USER 
+USER ## Section 3: Project Directory Layout
+USER 
+USER ```
+USER address-book/
+USER ├── pom.xml
+USER ├── src/
+USER │   ├── main/
+USER │   │   ├── java/com/addressbook/
+USER │   │   │   ├── AddressBookApplication.java
+USER │   │   │   ├── config/DatabaseInitializer.java
+USER │   │   │   ├── controller/ContactController.java
+USER │   │   │   ├── model/Contact.java
+USER │   │   │   ├── repository/ContactRepository.java
+USER │   │   │   └── service/ContactService.java
+USER │   │   └── resources/
+USER │   │       ├── application.properties
+USER │   │       ├── data.sql
+USER │   │       └── static/ (index.html, css/, js/)
+USER │   └── test/java/com/addressbook/
+USER │       └── ContactControllerTest.java
+USER └── ARCHITECTURE.md
+USER ```
+USER 
+USER ---
+USER 
+USER ## Section 4: Additional Notes
+USER 
+USER - **H2 Database Configuration:** In-memory or file-based configuration via `application.properties` for development and testing flexibility
+USER - **Sample Data:** 5 sample contacts pre-populated in H2 database on startup via `data.sql` script
+USER - **Validation:** Server-side validation using Spring `@Valid` annotations on controller method parameters with Bean Validation constraints
+USER - **Frontend:** Vanilla JavaScript implementation using Fetch API for all CRUD operations, with client-side validation before API calls
+USER ````
+USER 
+USER CODER.md
+USER ````
+USER # Address Book Web Application
+USER 
+USER Implement the Address Book Web Application step by step, following the instructions in `ARCHITECTURE.md`.
+USER 
+USER Based on `ARCHITECTURE.md`, I know:
+USER - Backend: Spring Boot with Java 17+, JPA, H2, Validation
+USER - Frontend: HTML/CSS/JS (no frameworks)
+USER - REST API: `/api/contacts`
+USER - Entity: `Contact` with fields: First Name, Last Name, Email, Phone, Address, Category/Tag
+USER 
+USER Let's implement all required files.
+USER 
+USER ## Files to Implement
+USER 
+USER 1. `pom.xml` with Spring Boot Starter Web, Data JPA, Validation, and H2 dependencies.
+USER 2. `src/main/resources/application.yml` configured for H2 in-memory DB and H2 console enabled.
+USER 3. Domain model: `Contact.java` entity with JPA annotations and Jakarta validation.
+USER 4. Repository: `ContactRepository.java` extending `JpaRepository`.
+USER 5. Service & Controller: `ContactService.java` and `ContactController.java` with REST endpoints.
+USER 6. Data initializer: `DataInitializer.java` to seed 5 sample contacts.
+USER 7. Frontend: `src/main/resources/static/index.html`, `styles.css`, and `app.js` providing a clean UI to view, add, edit, search, and delete contacts.
+USER 
+USER Ensure all imports are present and the backend compiles cleanly with `mvn spring-boot:run`.
+USER ````
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER Since this is the initial implementation, I am providing instructions to create all required files. 
+USER 
+USER ### 1. Project Configuration
+USER 
+USER **Create `pom.xml`**
+USER ```xml
+USER <?xml version="1.0" encoding="UTF-8"?>
+USER <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+USER 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+USER 	<modelVersion>4.0.0</modelVersion>
+USER 	<parent>
+USER 		<groupId>org.springframework.boot</groupId>
+USER 		<artifactId>spring-boot-starter-parent</artifactId>
+USER 		<version>3.2.0</version>
+USER 		<relativePath/>
+USER 	</parent>
+USER 	<groupId>com.addressbook</groupId>
+USER 	<artifactId>address-book</artifactId>
+USER 	<version>0.0.1-SNAPSHOT</version>
+USER 	<name>address-book</name>
+USER 	<description>Address Book Web Application</description>
+USER 	<properties>
+USER 		<java.version>17</java.version>
+USER 	</properties>
+USER 	<dependencies>
+USER 		<dependency>
+USER 			<groupId>org.springframework.boot</groupId>
+USER 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+USER 		</dependency>
+USER 		<dependency>
+USER 			<groupId>org.springframework.boot</groupId>
+USER 			<artifactId>spring-boot-starter-web</artifactId>
+USER 		</dependency>
+USER 		<dependency>
+USER 			<groupId>org.springframework.boot</groupId>
+USER 			<artifactId>spring-boot-starter-validation</artifactId>
+USER 		</dependency>
+USER 		<dependency>
+USER 			<groupId>com.h2database</groupId>
+USER 			<artifactId>h2</artifactId>
+USER 			<scope>runtime</scope>
+USER 		</dependency>
+USER 		<dependency>
+USER 			<groupId>org.springframework.boot</groupId>
+USER 			<artifactId>spring-boot-starter-test</artifactId>
+USER 			<scope>test</scope>
+USER 		</dependency>
+USER 	</dependencies>
+USER 	<build>
+USER 		<plugins>
+USER 			<plugin>
+USER 				<groupId>org.springframework.boot</groupId>
+USER 				<artifactId>spring-boot-maven-plugin</artifactId>
+USER 			</plugin>
+USER 		</plugins>
+USER 	</build>
+USER </project>
+USER ```
+USER 
+USER **Create `src/main/resources/application.yml`**
+USER ```yaml
+USER spring:
+USER   datasource:
+USER     url: jdbc:h2:mem:addressbookdb
+USER     driverClassName: org.h2.Driver
+USER     username: sa
+USER     password: 
+USER   jpa:
+USER     database-platform: org.hibernate.dialect.H2Dialect
+USER     hibernate:
+USER       ddl-auto: update
+USER     show-sql: true
+USER   h2:
+USER     console:
+USER       enabled: true
+USER ```
+USER 
+USER ### 2. Backend Implementation
+USER 
+USER **Create `src/main/java/com/addressbook/model/Contact.java`**
+USER ```java
+USER package com.addressbook.model;
+USER 
+USER import jakarta.persistence.*;
+USER import jakarta.validation.constraints.*;
+USER 
+USER @Entity
+USER public class Contact {
+USER     @Id
+USER     @GeneratedValue(strategy = GenerationType.IDENTITY)
+USER     private Long id;
+USER 
+USER     @NotBlank @Size(max = 50)
+USER     private String firstName;
+USER 
+USER     @NotBlank @Size(max = 50)
+USER     private String lastName;
+USER 
+USER     @NotBlank @Email @Size(max = 100)
+USER     private String email;
+USER 
+USER     @NotBlank @Size(max = 20)
+USER     private String phoneNumber;
+USER 
+USER     @NotBlank @Size(max = 255)
+USER     private String address;
+USER 
+USER     @NotBlank @Size(max = 50)
+USER     private String category;
+USER 
+USER     // Constructors
+USER     public Contact() {}
+USER 
+USER     public Contact(String firstName, String lastName, String email, String phoneNumber, String address, String category) {
+USER         this.firstName = firstName;
+USER         this.lastName = lastName;
+USER         this.email = email;
+USER         this.phoneNumber = phoneNumber;
+USER         this.address = address;
+USER         this.category = category;
+USER     }
+USER 
+USER     // Getters and Setters
+USER     public Long getId() { return id; }
+USER     public void setId(Long id) { this.id = id; }
+USER     public String getFirstName() { return firstName; }
+USER     public void setFirstName(String firstName) { this.firstName = firstName; }
+USER     public String getLastName() { return lastName; }
+USER     public void setLastName(String lastName) { this.lastName = lastName; }
+USER     public String getEmail() { return email; }
+USER     public void setEmail(String email) { this.email = email; }
+USER     public String getPhoneNumber() { return phoneNumber; }
+USER     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+USER     public String getAddress() { return address; }
+USER     public void setAddress(String address) { this.address = address; }
+USER     public String getCategory() { return category; }
+USER     public void setCategory(String category) { this.category = category; }
+USER }
+USER ```
+USER 
+USER **Create `src/main/java/com/addressbook/repository/ContactRepository.java`**
+USER ```java
+USER package com.addressbook.repository;
+USER 
+USER import com.addressbook.model.Contact;
+USER import org.springframework.data.jpa.repository.JpaRepository;
+USER import org.springframework.data.jpa.repository.Query;
+USER import org.springframework.data.repository.query.Param;
+USER import java.util.List;
+USER 
+USER public interface ContactRepository extends JpaRepository<Contact, Long> {
+USER     @Query("SELECT c FROM Contact c WHERE " +
+USER            "LOWER(c.firstName) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+USER            "LOWER(c.lastName) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+USER            "LOWER(c.category) LIKE LOWER(CONCAT('%', :q, '%'))")
+USER     List<Contact> search(@Param("q") String query);
+USER }
+USER ```
+USER 
+USER **Create `src/main/java/com/addressbook/service/ContactService.java`**
+USER ```java
+USER package com.addressbook.service;
+USER 
+USER import com.addressbook.model.Contact;
+USER import com.addressbook.repository.ContactRepository;
+USER import org.springframework.stereotype.Service;
+USER import java.util.List;
+USER 
+USER @Service
+USER public class ContactService {
+USER     private final ContactRepository repository;
+USER 
+USER     public ContactService(ContactRepository repository) {
+USER         this.repository = repository;
+USER     }
+USER 
+USER     public List<Contact> getAllContacts() { return repository.findAll(); }
+USER     public Contact getContactById(Long id) { return repository.findById(id).orElseThrow(); }
+USER     public Contact createContact(Contact contact) { return repository.save(contact); }
+USER     public Contact updateContact(Long id, Contact details) {
+USER         Contact contact = getContactById(id);
+USER         contact.setFirstName(details.getFirstName());
+USER         contact.setLastName(details.getLastName());
+USER         contact.setEmail(details.getEmail());
+USER         contact.setPhoneNumber(details.getPhoneNumber());
+USER         contact.setAddress(details.getAddress());
+USER         contact.setCategory(details.getCategory());
+USER         return repository.save(contact);
+USER     }
+USER     public void deleteContact(Long id) { repository.deleteById(id); }
+USER     public List<Contact> searchContacts(String query) { return repository.search(query); }
+USER }
+USER ```
+USER 
+USER **Create `src/main/java/com/addressbook/controller/ContactController.java`**
+USER ```java
+USER package com.addressbook.controller;
+USER 
+USER import com.addressbook.model.Contact;
+USER import com.addressbook.service.ContactService;
+USER import jakarta.validation.Valid;
+USER import org.springframework.http.HttpStatus;
+USER import org.springframework.http.ResponseEntity;
+USER import org.springframework.web.bind.annotation.*;
+USER 
+USER import java.util.List;
+USER 
+USER @RestController
+USER @RequestMapping("/api/contacts")
+USER @CrossOrigin("*")
+USER public class ContactController {
+USER     private final ContactService service;
+USER 
+USER     public ContactController(ContactService service) {
+USER         this.service = service;
+USER     }
+USER 
+USER     @GetMapping
+USER     public List<Contact> getAll() { return service.getAllContacts(); }
+USER 
+USER     @GetMapping("/{id}")
+USER     public Contact getById(@PathVariable Long id) { return service.getContactById(id); }
+USER 
+USER     @PostMapping
+USER     @ResponseStatus(HttpStatus.CREATED)
+USER     public Contact create(@Valid @RequestBody Contact contact) { return service.createContact(contact); }
+USER 
+USER     @PutMapping("/{id}")
+USER     public Contact update(@PathVariable Long id, @Valid @RequestBody Contact contact) {
+USER         return service.updateContact(id, contact);
+USER     }
+USER 
+USER     @DeleteMapping("/{id}")
+USER     @ResponseStatus(HttpStatus.NO_CONTENT)
+USER     public void delete(@PathVariable Long id) { service.deleteContact(id); }
+USER 
+USER     @GetMapping("/search")
+USER     public List<Contact> search(@RequestParam String q) { return service.searchContacts(q); }
+USER }
+USER ```
+USER 
+USER **Create `src/main/java/com/addressbook/config/DatabaseInitializer.java`**
+USER ```java
+USER package com.addressbook.config;
+USER 
+USER import com.addressbook.model.Contact;
+USER import com.addressbook.repository.ContactRepository;
+USER import org.springframework.boot.CommandLineRunner;
+USER import org.springframework.stereotype.Component;
+USER import java.util.List;
+USER 
+USER @Component
+USER public class DatabaseInitializer implements CommandLineRunner {
+USER     private final ContactRepository repository;
+USER 
+USER     public DatabaseInitializer(ContactRepository repository) {
+USER         this.repository = repository;
+USER     }
+USER 
+USER     @Override
+USER     public void run(String... args) {
+USER         repository.saveAll(List.of(
+USER             new Contact("John", "Doe", "john@example.com", "1234567890", "123 Main St", "Family"),
+USER             new Contact("Jane", "Smith", "jane@example.com", "0987654321", "456 Oak Ave", "Work"),
+USER             new Contact("Alice", "Johnson", "alice@example.com", "1122334455", "789 Pine Rd", "Friend"),
+USER             new Contact("Bob", "Brown", "bob@example.com", "5566778899", "321 Elm St", "Work"),
+USER             new Contact("Charlie", "Davis", "charlie@example.com", "9988776655", "654 Maple Dr", "Family")
+USER         ));
+USER     }
+USER }
+USER ```
+USER 
+USER **Create `src/main/java/com/addressbook/AddressBookApplication.java`**
+USER ```java
+USER package com.addressbook;
+USER 
+USER import org.springframework.boot.SpringApplication;
+USER import org.springframework.boot.autoconfigure.SpringBootApplication;
+USER 
+USER @SpringBootApplication
+USER public class AddressBookApplication {
+USER 	public static void main(String[] args) {
+USER 		SpringApplication.run(AddressBookApplication.class, args);
+USER 	}
+USER }
+USER ```
+USER 
+USER ### 3. Frontend Implementation
+USER 
+USER **Create `src/main/resources/static/index.html`**
+USER ```html
+USER <!DOCTYPE html>
+USER <html lang="en">
+USER <head>
+USER     <meta charset="UTF-8">
+USER     <title>Address Book</title>
+USER     <link rel="stylesheet" href="css/styles.css">
+USER </head>
+USER <body>
+USER     <div class="container">
+USER         <h1>Address Book</h1>
+USER         
+USER         <div class="search-bar">
+USER             <input type="text" id="searchInput" placeholder="Search by name or category...">
+USER             <button onclick="searchContacts()">Search</button>
+USER         </div>
+USER 
+USER         <form id="contactForm">
+USER             <input type="hidden" id="contactId">
+USER             <input type="text" id="firstName" placeholder="First Name" required>
+USER             <input type="text" id="lastName" placeholder="Last Name" required>
+USER             <input type="email" id="email" placeholder="Email" required>
+USER             <input type="text" id="phoneNumber" placeholder="Phone Number" required>
+USER             <input type="text" id="address" placeholder="Address" required>
+USER             <input type="text" id="category" placeholder="Category (e.g. Family)" required>
+USER             <button type="submit" id="submitBtn">Add Contact</button>
+USER             <button type="button" id="cancelBtn" onclick="resetForm()" style="display:none;">Cancel</button>
+USER         </form>
+USER 
+USER         <table id="contactTable">
+USER             <thead>
+USER                 <tr>
+USER                     <th>Name</th>
+USER                     <th>Email</th>
+USER                     <th>Phone</th>
+USER                     <th>Category</th>
+USER                     <th>Actions</th>
+USER                 </tr>
+USER             </thead>
+USER             <tbody id="contactList"></tbody>
+USER         </table>
+USER     </div>
+USER     <script src="js/app.js"></script>
+USER </body>
+USER </html>
+USER ```
+USER 
+USER **Create `src/main/resources/static/css/styles.css`**
+USER ```css
+USER body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+USER .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+USER form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+USER form input, form button { padding: 8px; }
+USER form button { grid-column: span 2; background: #28a745; color: white; border: none; cursor: pointer; }
+USER #cancelBtn { background: #dc3545; }
+USER .search-bar { margin-bottom: 20px; display: flex; gap: 10px; }
+USER .search-bar input { flex-grow: 1; padding: 8px; }
+USER table { width: 100%; border-collapse: collapse; }
+USER th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+USER button.edit-btn { background: #ffc107; border: none; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
+USER button.delete-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+USER ```
+USER 
+USER **Create `src/main/resources/static/js/app.js`**
+USER ```javascript
+USER const API_URL = '/api/contacts';
+USER const contactForm = document.getElementById('contactForm');
+USER const contactList = document.getElementById('contactList');
+USER 
+USER document.addEventListener('DOMContentLoaded', fetchContacts);
+USER 
+USER contactForm.addEventListener('submit', async (e) => {
+USER     e.preventDefault();
+USER     const id = document.getElementById('contactId').value;
+USER     const contact = {
+USER         firstName: document.getElementById('firstName').value,
+USER         lastName: document.getElementById('lastName').value,
+USER         email: document.getElementById('email').value,
+USER         phoneNumber: document.getElementById('phoneNumber').value,
+USER         address: document.getElementById('address').value,
+USER         category: document.getElementById('category').value
+USER     };
+USER 
+USER     const method = id ? 'PUT' : 'POST';
+USER     const url = id ? `${API_URL}/${id}` : API_URL;
+USER 
+USER     await fetch(url, {
+USER         method,
+USER         headers: { 'Content-Type': 'application/json' },
+USER         body: JSON.stringify(contact)
+USER     });
+USER 
+USER     resetForm();
+USER     fetchContacts();
+USER });
+USER 
+USER async function fetchContacts() {
+USER     const res = await fetch(API_URL);
+USER     const contacts = await res.json();
+USER     renderContacts(contacts);
+USER }
+USER 
+USER async function searchContacts() {
+USER     const query = document.getElementById('searchInput').value;
+USER     const res = await fetch(`${API_URL}/search?q=${encodeURIComponent(query)}`);
+USER     const contacts = await res.json();
+USER     renderContacts(contacts);
+USER }
+USER 
+USER function renderContacts(contacts) {
+USER     contactList.innerHTML = '';
+USER     contacts.forEach(c => {
+USER         const tr = document.createElement('tr');
+USER         tr.innerHTML = `
+USER             <td>${c.firstName} ${c.lastName}</td>
+USER             <td>${c.email}</td>
+USER             <td>${c.phoneNumber}</td>
+USER             <td>${c.category}</td>
+USER             <td>
+USER                 <button class="edit-btn" onclick="editContact(${c.id})">Edit</button>
+USER                 <button class="delete-btn" onclick="deleteContact(${c.id})">Delete</button>
+USER             </td>
+USER         `;
+USER         contactList.appendChild(tr);
+USER     });
+USER }
+USER 
+USER async function deleteContact(id) {
+USER     if (confirm('Delete this contact?')) {
+USER         await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+USER         fetchContacts();
+USER     }
+USER }
+USER 
+USER async function editContact(id) {
+USER     const res = await fetch(`${API_URL}/${id}`);
+USER     const c = await res.json();
+USER     document.getElementById('contactId').value = c.id;
+USER     document.getElementById('firstName').value = c.firstName;
+USER     document.getElementById('lastName').value = c.lastName;
+USER     document.getElementById('email').value = c.email;
+USER     document.getElementById('phoneNumber').value = c.phoneNumber;
+USER     document.getElementById('address').value = c.address;
+USER     document.getElementById('category').value = c.category;
+USER     document.getElementById('submitBtn').innerText = 'Update Contact';
+USER     document.getElementById('cancelBtn').style.display = 'inline-block';
+USER }
+USER 
+USER function resetForm() {
+USER     contactForm.reset();
+USER     document.getElementById('contactId').value = '';
+USER     document.getElementById('submitBtn').innerText = 'Add Contact';
+USER     document.getElementById('cancelBtn').style.display = 'none';
+USER }
+USER ```
+USER 
+USER # *SEARCH/REPLACE block* Rules:
+USER 
+USER Every *SEARCH/REPLACE block* must use this format:
+USER 1. The *FULL* file path alone on a line, verbatim. No bold asterisks, no quotes around it, no escaping of characters, etc.
+USER 2. The opening fence and code language, eg: ````python
+USER 3. The start of search block: <<<<<<< SEARCH
+USER 4. A contiguous chunk of lines to search for in the existing source code
+USER 5. The dividing line: =======
+USER 6. The lines to replace into the source code
+USER 7. The end of the replace block: >>>>>>> REPLACE
+USER 8. The closing fence: ````
+USER 
+USER Use the *FULL* file path, as shown to you by the user.
+USER 
+USER IMPORTANT: Use *quadruple* backticks ```` as fences, not triple backticks!
+USER 
+USER Every *SEARCH* section must *EXACTLY MATCH* the existing file content, character for character, including all comments, docstrings, etc.
+USER If the file contains code or other data wrapped/escaped in json/xml/quotes or other containers, you need to propose edits to the literal contents of the file, including the container markup.
+USER 
+USER *SEARCH/REPLACE* blocks will *only* replace the first match occurrence.
+USER Including multiple unique *SEARCH/REPLACE* blocks if needed.
+USER Include enough lines in each SEARCH section to uniquely match each set of lines that need to change.
+USER 
+USER Keep *SEARCH/REPLACE* blocks concise.
+USER Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
+USER Include just the changing lines, and a few surrounding lines if needed for uniqueness.
+USER Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
+USER 
+USER Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
+USER 
+USER To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+USER 
+USER Pay attention to which filenames the user wants you to edit, especially if they are asking you to create a new file.
+USER 
+USER If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
+USER - A new file path, including dir name if needed
+USER - An empty `SEARCH` section
+USER - The new file's contents in the `REPLACE` section
+USER 
+USER Reply in English.
+USER ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+USER 
+LLM RESPONSE 2026-08-07T14:54:51
+ASSISTANT <thinking-content-7bbeb8e1441453ad999a0bbba8a46d4b>
+ASSISTANT 
+ASSISTANT The user wants me to create a set of files for a new project based on provided instructions and code snippets. I need to use the `SEARCH/REPLACE` format with quadruple backticks.
+ASSISTANT 
+ASSISTANT Here is the list of files to create:
+ASSISTANT 1. `pom.xml`
+ASSISTANT 2. `src/main/resources/application.yml`
+ASSISTANT 3. `src/main/java/com/addressbook/model/Contact.java`
+ASSISTANT 4. `src/main/java/com/addressbook/repository/ContactRepository.java`
+ASSISTANT 5. `src/main/java/com/addressbook/service/ContactService.java`
+ASSISTANT 6. `src/main/java/com/addressbook/controller/ContactController.java`
+ASSISTANT 7. `src/main/java/com/addressbook/config/DatabaseInitializer.java`
+ASSISTANT 8. `src/main/java/com/addressbook/AddressBookApplication.java`
+ASSISTANT 9. `src/main/resources/static/index.html`
+ASSISTANT 10. `src/main/resources/static/css/styles.css`
+ASSISTANT 11. `src/main/resources/static/js/app.js`
+ASSISTANT 
+ASSISTANT I will go through them one by one and generate the `SEARCH/REPLACE` blocks for new files.
+ASSISTANT 
+ASSISTANT 1. `pom.xml`
+ASSISTANT 2. `src/main/resources/application.yml`
+ASSISTANT 3. `src/main/java/com/addressbook/model/Contact.java`
+ASSISTANT 4. `src/main/java/com/addressbook/repository/ContactRepository.java`
+ASSISTANT 5. `src/main/java/com/addressbook/service/ContactService.java`
+ASSISTANT 6. `src/main/java/com/addressbook/controller/ContactController.java`
+ASSISTANT 7. `src/main/java/com/addressbook/config/DatabaseInitializer.java`
+ASSISTANT 8. `src/main/java/com/addressbook/AddressBookApplication.java`
+ASSISTANT 9. `src/main/resources/static/index.html`
+ASSISTANT 10. `src/main/resources/static/css/styles.css`
+ASSISTANT 11. `src/main/resources/static/js/app.js`
+ASSISTANT 
+ASSISTANT Wait, I need to make sure I use `SEARCH` section as empty for new files.
+ASSISTANT 
+ASSISTANT Let's start.
+ASSISTANT 
+ASSISTANT </thinking-content-7bbeb8e1441453ad999a0bbba8a46d4b>
+ASSISTANT 
+ASSISTANT pom.xml
+ASSISTANT ````xml
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT <?xml version="1.0" encoding="UTF-8"?>
+ASSISTANT <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ASSISTANT 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+ASSISTANT 	<modelVersion>4.0.0</modelVersion>
+ASSISTANT 	<parent>
+ASSISTANT 		<groupId>org.springframework.boot</groupId>
+ASSISTANT 		<artifactId>spring-boot-starter-parent</artifactId>
+ASSISTANT 		<version>3.2.0</version>
+ASSISTANT 		<relativePath/>
+ASSISTANT 	</parent>
+ASSISTANT 	<groupId>com.addressbook</groupId>
+ASSISTANT 	<artifactId>address-book</artifactId>
+ASSISTANT 	<version>0.0.1-SNAPSHOT</version>
+ASSISTANT 	<name>address-book</name>
+ASSISTANT 	<description>Address Book Web Application</description>
+ASSISTANT 	<properties>
+ASSISTANT 		<java.version>17</java.version>
+ASSISTANT 	</properties>
+ASSISTANT 	<dependencies>
+ASSISTANT 		<dependency>
+ASSISTANT 			<groupId>org.springframework.boot</groupId>
+ASSISTANT 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+ASSISTANT 		</dependency>
+ASSISTANT 		<dependency>
+ASSISTANT 			<groupId>org.springframework.boot</groupId>
+ASSISTANT 			<artifactId>spring-boot-starter-web</artifactId>
+ASSISTANT 		</dependency>
+ASSISTANT 		<dependency>
+ASSISTANT 			<groupId>org.springframework.boot</groupId>
+ASSISTANT 			<artifactId>spring-boot-starter-validation</artifactId>
+ASSISTANT 		</dependency>
+ASSISTANT 		<dependency>
+ASSISTANT 			<groupId>com.h2database</groupId>
+ASSISTANT 			<artifactId>h2</artifactId>
+ASSISTANT 			<scope>runtime</scope>
+ASSISTANT 		</dependency>
+ASSISTANT 		<dependency>
+ASSISTANT 			<groupId>org.springframework.boot</groupId>
+ASSISTANT 			<artifactId>spring-boot-starter-test</artifactId>
+ASSISTANT 			<scope>test</scope>
+ASSISTANT 		</dependency>
+ASSISTANT 	</dependencies>
+ASSISTANT 	<build>
+ASSISTANT 		<plugins>
+ASSISTANT 			<plugin>
+ASSISTANT 				<groupId>org.springframework.boot</groupId>
+ASSISTANT 				<artifactId>spring-boot-maven-plugin</artifactId>
+ASSISTANT 			</plugin>
+ASSISTANT 		</plugins>
+ASSISTANT 	</build>
+ASSISTANT </project>
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/resources/application.yml
+ASSISTANT ````yaml
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT spring:
+ASSISTANT   datasource:
+ASSISTANT     url: jdbc:h2:mem:addressbookdb
+ASSISTANT     driverClassName: org.h2.Driver
+ASSISTANT     username: sa
+ASSISTANT     password: 
+ASSISTANT   jpa:
+ASSISTANT     database-platform: org.hibernate.dialect.H2Dialect
+ASSISTANT     hibernate:
+ASSISTANT       ddl-auto: update
+ASSISTANT     show-sql: true
+ASSISTANT   h2:
+ASSISTANT     console:
+ASSISTANT       enabled: true
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/java/com/addressbook/model/Contact.java
+ASSISTANT ````java
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT package com.addressbook.model;
+ASSISTANT 
+ASSISTANT import jakarta.persistence.*;
+ASSISTANT import jakarta.validation.constraints.*;
+ASSISTANT 
+ASSISTANT @Entity
+ASSISTANT public class Contact {
+ASSISTANT     @Id
+ASSISTANT     @GeneratedValue(strategy = GenerationType.IDENTITY)
+ASSISTANT     private Long id;
+ASSISTANT 
+ASSISTANT     @NotBlank @Size(max = 50)
+ASSISTANT     private String firstName;
+ASSISTANT 
+ASSISTANT     @NotBlank @Size(max = 50)
+ASSISTANT     private String lastName;
+ASSISTANT 
+ASSISTANT     @NotBlank @Email @Size(max = 100)
+ASSISTANT     private String email;
+ASSISTANT 
+ASSISTANT     @NotBlank @Size(max = 20)
+ASSISTANT     private String phoneNumber;
+ASSISTANT 
+ASSISTANT     @NotBlank @Size(max = 255)
+ASSISTANT     private String address;
+ASSISTANT 
+ASSISTANT     @NotBlank @Size(max = 50)
+ASSISTANT     private String category;
+ASSISTANT 
+ASSISTANT     // Constructors
+ASSISTANT     public Contact() {}
+ASSISTANT 
+ASSISTANT     public Contact(String firstName, String lastName, String email, String phoneNumber, String address, String category) {
+ASSISTANT         this.firstName = firstName;
+ASSISTANT         this.lastName = lastName;
+ASSISTANT         this.email = email;
+ASSISTANT         this.phoneNumber = phoneNumber;
+ASSISTANT         this.address = address;
+ASSISTANT         this.category = category;
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     // Getters and Setters
+ASSISTANT     public Long getId() { return id; }
+ASSISTANT     public void setId(Long id) { this.id = id; }
+ASSISTANT     public String getFirstName() { return firstName; }
+ASSISTANT     public void setFirstName(String firstName) { this.firstName = firstName; }
+ASSISTANT     public String getLastName() { return lastName; }
+ASSISTANT     public void setLastName(String lastName) { this.lastName = lastName; }
+ASSISTANT     public String getEmail() { return email; }
+ASSISTANT     public void setEmail(String email) { this.email = email; }
+ASSISTANT     public String getPhoneNumber() { return phoneNumber; }
+ASSISTANT     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+ASSISTANT     public String getAddress() { return address; }
+ASSISTANT     public void setAddress(String address) { this.address = address; }
+ASSISTANT     public String getCategory() { return category; }
+ASSISTANT     public void setCategory(String category) { this.category = category; }
+ASSISTANT }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/java/com/addressbook/repository/ContactRepository.java
+ASSISTANT ````java
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT package com.addressbook.repository;
+ASSISTANT 
+ASSISTANT import com.addressbook.model.Contact;
+ASSISTANT import org.springframework.data.jpa.repository.JpaRepository;
+ASSISTANT import org.springframework.data.jpa.repository.Query;
+ASSISTANT import org.springframework.data.repository.query.Param;
+ASSISTANT import java.util.List;
+ASSISTANT 
+ASSISTANT public interface ContactRepository extends JpaRepository<Contact, Long> {
+ASSISTANT     @Query("SELECT c FROM Contact c WHERE " +
+ASSISTANT            "LOWER(c.firstName) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+ASSISTANT            "LOWER(c.lastName) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+ASSISTANT            "LOWER(c.category) LIKE LOWER(CONCAT('%', :q, '%'))")
+ASSISTANT     List<Contact> search(@Param("q") String query);
+ASSISTANT }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/java/com/addressbook/service/ContactService.java
+ASSISTANT ````java
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT package com.addressbook.service;
+ASSISTANT 
+ASSISTANT import com.addressbook.model.Contact;
+ASSISTANT import com.addressbook.repository.ContactRepository;
+ASSISTANT import org.springframework.stereotype.Service;
+ASSISTANT import java.util.List;
+ASSISTANT 
+ASSISTANT @Service
+ASSISTANT public class ContactService {
+ASSISTANT     private final ContactRepository repository;
+ASSISTANT 
+ASSISTANT     public ContactService(ContactRepository repository) {
+ASSISTANT         this.repository = repository;
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     public List<Contact> getAllContacts() { return repository.findAll(); }
+ASSISTANT     public Contact getContactById(Long id) { return repository.findById(id).orElseThrow(); }
+ASSISTANT     public Contact createContact(Contact contact) { return repository.save(contact); }
+ASSISTANT     public Contact updateContact(Long id, Contact details) {
+ASSISTANT         Contact contact = getContactById(id);
+ASSISTANT         contact.setFirstName(details.getFirstName());
+ASSISTANT         contact.setLastName(details.getLastName());
+ASSISTANT         contact.setEmail(details.getEmail());
+ASSISTANT         contact.setPhoneNumber(details.getPhoneNumber());
+ASSISTANT         contact.setAddress(details.getAddress());
+ASSISTANT         contact.setCategory(details.getCategory());
+ASSISTANT         return repository.save(contact);
+ASSISTANT     }
+ASSISTANT     public void deleteContact(Long id) { repository.deleteById(id); }
+ASSISTANT     public List<Contact> searchContacts(String query) { return repository.search(query); }
+ASSISTANT }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/java/com/addressbook/controller/ContactController.java
+ASSISTANT ````java
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT package com.addressbook.controller;
+ASSISTANT 
+ASSISTANT import com.addressbook.model.Contact;
+ASSISTANT import com.addressbook.service.ContactService;
+ASSISTANT import jakarta.validation.Valid;
+ASSISTANT import org.springframework.http.HttpStatus;
+ASSISTANT import org.springframework.http.ResponseEntity;
+ASSISTANT import org.springframework.web.bind.annotation.*;
+ASSISTANT 
+ASSISTANT import java.util.List;
+ASSISTANT 
+ASSISTANT @RestController
+ASSISTANT @RequestMapping("/api/contacts")
+ASSISTANT @CrossOrigin("*")
+ASSISTANT public class ContactController {
+ASSISTANT     private final ContactService service;
+ASSISTANT 
+ASSISTANT     public ContactController(ContactService service) {
+ASSISTANT         this.service = service;
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     @GetMapping
+ASSISTANT     public List<Contact> getAll() { return service.getAllContacts(); }
+ASSISTANT 
+ASSISTANT     @GetMapping("/{id}")
+ASSISTANT     public Contact getById(@PathVariable Long id) { return service.getContactById(id); }
+ASSISTANT 
+ASSISTANT     @PostMapping
+ASSISTANT     @ResponseStatus(HttpStatus.CREATED)
+ASSISTANT     public Contact create(@Valid @RequestBody Contact contact) { return service.createContact(contact); }
+ASSISTANT 
+ASSISTANT     @PutMapping("/{id}")
+ASSISTANT     public Contact update(@PathVariable Long id, @Valid @RequestBody Contact contact) {
+ASSISTANT         return service.updateContact(id, contact);
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     @DeleteMapping("/{id}")
+ASSISTANT     @ResponseStatus(HttpStatus.NO_CONTENT)
+ASSISTANT     public void delete(@PathVariable Long id) { service.deleteContact(id); }
+ASSISTANT 
+ASSISTANT     @GetMapping("/search")
+ASSISTANT     public List<Contact> search(@RequestParam String q) { return service.searchContacts(q); }
+ASSISTANT }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/java/com/addressbook/config/DatabaseInitializer.java
+ASSISTANT ````java
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT package com.addressbook.config;
+ASSISTANT 
+ASSISTANT import com.addressbook.model.Contact;
+ASSISTANT import com.addressbook.repository.ContactRepository;
+ASSISTANT import org.springframework.boot.CommandLineRunner;
+ASSISTANT import org.springframework.stereotype.Component;
+ASSISTANT import java.util.List;
+ASSISTANT 
+ASSISTANT @Component
+ASSISTANT public class DatabaseInitializer implements CommandLineRunner {
+ASSISTANT     private final ContactRepository repository;
+ASSISTANT 
+ASSISTANT     public DatabaseInitializer(ContactRepository repository) {
+ASSISTANT         this.repository = repository;
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     @Override
+ASSISTANT     public void run(String... args) {
+ASSISTANT         repository.saveAll(List.of(
+ASSISTANT             new Contact("John", "Doe", "john@example.com", "1234567890", "123 Main St", "Family"),
+ASSISTANT             new Contact("Jane", "Smith", "jane@example.com", "0987654321", "456 Oak Ave", "Work"),
+ASSISTANT             new Contact("Alice", "Johnson", "alice@example.com", "1122334455", "789 Pine Rd", "Friend"),
+ASSISTANT             new Contact("Bob", "Brown", "bob@example.com", "5566778899", "321 Elm St", "Work"),
+ASSISTANT             new Contact("Charlie", "Davis", "charlie@example.com", "9988776655", "654 Maple Dr", "Family")
+ASSISTANT         ));
+ASSISTANT     }
+ASSISTANT }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/java/com/addressbook/AddressBookApplication.java
+ASSISTANT ````java
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT package com.addressbook;
+ASSISTANT 
+ASSISTANT import org.springframework.boot.SpringApplication;
+ASSISTANT import org.springframework.boot.autoconfigure.SpringBootApplication;
+ASSISTANT 
+ASSISTANT @SpringBootApplication
+ASSISTANT public class AddressBookApplication {
+ASSISTANT 	public static void main(String[] args) {
+ASSISTANT 		SpringApplication.run(AddressBookApplication.class, args);
+ASSISTANT 	}
+ASSISTANT }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/resources/static/index.html
+ASSISTANT ````html
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT <!DOCTYPE html>
+ASSISTANT <html lang="en">
+ASSISTANT <head>
+ASSISTANT     <meta charset="UTF-8">
+ASSISTANT     <title>Address Book</title>
+ASSISTANT     <link rel="stylesheet" href="css/styles.css">
+ASSISTANT </head>
+ASSISTANT <body>
+ASSISTANT     <div class="container">
+ASSISTANT         <h1>Address Book</h1>
+ASSISTANT         
+ASSISTANT         <div class="search-bar">
+ASSISTANT             <input type="text" id="searchInput" placeholder="Search by name or category...">
+ASSISTANT             <button onclick="searchContacts()">Search</button>
+ASSISTANT         </div>
+ASSISTANT 
+ASSISTANT         <form id="contactForm">
+ASSISTANT             <input type="hidden" id="contactId">
+ASSISTANT             <input type="text" id="firstName" placeholder="First Name" required>
+ASSISTANT             <input type="text" id="lastName" placeholder="Last Name" required>
+ASSISTANT             <input type="email" id="email" placeholder="Email" required>
+ASSISTANT             <input type="text" id="phoneNumber" placeholder="Phone Number" required>
+ASSISTANT             <input type="text" id="address" placeholder="Address" required>
+ASSISTANT             <input type="text" id="category" placeholder="Category (e.g. Family)" required>
+ASSISTANT             <button type="submit" id="submitBtn">Add Contact</button>
+ASSISTANT             <button type="button" id="cancelBtn" onclick="resetForm()" style="display:none;">Cancel</button>
+ASSISTANT         </form>
+ASSISTANT 
+ASSISTANT         <table id="contactTable">
+ASSISTANT             <thead>
+ASSISTANT                 <tr>
+ASSISTANT                     <th>Name</th>
+ASSISTANT                     <th>Email</th>
+ASSISTANT                     <th>Phone</th>
+ASSISTANT                     <th>Category</th>
+ASSISTANT                     <th>Actions</th>
+ASSISTANT                 </tr>
+ASSISTANT             </thead>
+ASSISTANT             <tbody id="contactList"></tbody>
+ASSISTANT         </table>
+ASSISTANT     </div>
+ASSISTANT     <script src="js/app.js"></script>
+ASSISTANT </body>
+ASSISTANT </html>
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/resources/static/css/styles.css
+ASSISTANT ````css
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+ASSISTANT .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+ASSISTANT form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+ASSISTANT form input, form button { padding: 8px; }
+ASSISTANT form button { grid-column: span 2; background: #28a745; color: white; border: none; cursor: pointer; }
+ASSISTANT #cancelBtn { background: #dc3545; }
+ASSISTANT .search-bar { margin-bottom: 20px; display: flex; gap: 10px; }
+ASSISTANT .search-bar input { flex-grow: 1; padding: 8px; }
+ASSISTANT table { width: 100%; border-collapse: collapse; }
+ASSISTANT th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+ASSISTANT button.edit-btn { background: #ffc107; border: none; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
+ASSISTANT button.delete-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/resources/static/js/app.js
+ASSISTANT ````javascript
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT const API_URL = '/api/contacts';
+ASSISTANT const contactForm = document.getElementById('contactForm');
+ASSISTANT const contactList = document.getElementById('contactList');
+ASSISTANT 
+ASSISTANT document.addEventListener('DOMContentLoaded', fetchContacts);
+ASSISTANT 
+ASSISTANT contactForm.addEventListener('submit', async (e) => {
+ASSISTANT     e.preventDefault();
+ASSISTANT     const id = document.getElementById('contactId').value;
+ASSISTANT     const contact = {
+ASSISTANT         firstName: document.getElementById('firstName').value,
+ASSISTANT         lastName: document.getElementById('lastName').value,
+ASSISTANT         email: document.getElementById('email').value,
+ASSISTANT         phoneNumber: document.getElementById('phoneNumber').value,
+ASSISTANT         address: document.getElementById('address').value,
+ASSISTANT         category: document.getElementById('category').value
+ASSISTANT     };
+ASSISTANT 
+ASSISTANT     const method = id ? 'PUT' : 'POST';
+ASSISTANT     const url = id ? `${API_URL}/${id}` : API_URL;
+ASSISTANT 
+ASSISTANT     await fetch(url, {
+ASSISTANT         method,
+ASSISTANT         headers: { 'Content-Type': 'application/json' },
+ASSISTANT         body: JSON.stringify(contact)
+ASSISTANT     });
+ASSISTANT 
+ASSISTANT     resetForm();
+ASSISTANT     fetchContacts();
+ASSISTANT });
+ASSISTANT 
+ASSISTANT async function fetchContacts() {
+ASSISTANT     const res = await fetch(API_URL);
+ASSISTANT     const contacts = await res.json();
+ASSISTANT     renderContacts(contacts);
+ASSISTANT }
+ASSISTANT 
+ASSISTANT async function searchContacts() {
+ASSISTANT     const query = document.getElementById('searchInput').value;
+ASSISTANT     const res = await fetch(`${API_URL}/search?q=${encodeURIComponent(query)}`);
+ASSISTANT     const contacts = await res.json();
+ASSISTANT     renderContacts(contacts);
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function renderContacts(contacts) {
+ASSISTANT     contactList.innerHTML = '';
+ASSISTANT     contacts.forEach(c => {
+ASSISTANT         const tr = document.createElement('tr');
+ASSISTANT         tr.innerHTML = `
+ASSISTANT             <td>${c.firstName} ${c.lastName}</td>
+ASSISTANT             <td>${c.email}</td>
+ASSISTANT             <td>${c.phoneNumber}</td>
+ASSISTANT             <td>${c.category}</td>
+ASSISTANT             <td>
+ASSISTANT                 <button class="edit-btn" onclick="editContact(${c.id})">Edit</button>
+ASSISTANT                 <button class="delete-btn" onclick="deleteContact(${c.id})">Delete</button>
+ASSISTANT             </td>
+ASSISTANT         `;
+ASSISTANT         contactList.appendChild(tr);
+ASSISTANT     });
+ASSISTANT }
+ASSISTANT 
+ASSISTANT async function deleteContact(id) {
+ASSISTANT     if (confirm('Delete this contact?')) {
+ASSISTANT         await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+ASSISTANT         fetchContacts();
+ASSISTANT     }
+ASSISTANT }
+ASSISTANT 
+ASSISTANT async function editContact(id) {
+ASSISTANT     const res = await fetch(`${API_URL}/${id}`);
+ASSISTANT     const c = await res.json();
+ASSISTANT     document.getElementById('contactId').value = c.id;
+ASSISTANT     document.getElementById('firstName').value = c.firstName;
+ASSISTANT     document.getElementById('lastName').value = c.lastName;
+ASSISTANT     document.getElementById('email').value = c.email;
+ASSISTANT     document.getElementById('phoneNumber').value = c.phoneNumber;
+ASSISTANT     document.getElementById('address').value = c.address;
+ASSISTANT     document.getElementById('category').value = c.category;
+ASSISTANT     document.getElementById('submitBtn').innerText = 'Update Contact';
+ASSISTANT     document.getElementById('cancelBtn').style.display = 'inline-block';
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function resetForm() {
+ASSISTANT     contactForm.reset();
+ASSISTANT     document.getElementById('contactId').value = '';
+ASSISTANT     document.getElementById('submitBtn').innerText = 'Add Contact';
+ASSISTANT     document.getElementById('cancelBtn').style.display = 'none';
+ASSISTANT }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+TO LLM 2026-08-07T14:55:24
+-------
+SYSTEM Act as an expert software developer who edits source code.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Describe each change with a *SEARCH/REPLACE block* per the examples below.
+SYSTEM All changes to files must use this *SEARCH/REPLACE block* format.
+SYSTEM ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+SYSTEM 
+SYSTEM # *SEARCH/REPLACE block* Rules:
+SYSTEM 
+SYSTEM Every *SEARCH/REPLACE block* must use this format:
+SYSTEM 1. The *FULL* file path alone on a line, verbatim. No bold asterisks, no quotes around it, no escaping of characters, etc.
+SYSTEM 2. The opening fence and code language, eg: ````python
+SYSTEM 3. The start of search block: <<<<<<< SEARCH
+SYSTEM 4. A contiguous chunk of lines to search for in the existing source code
+SYSTEM 5. The dividing line: =======
+SYSTEM 6. The lines to replace into the source code
+SYSTEM 7. The end of the replace block: >>>>>>> REPLACE
+SYSTEM 8. The closing fence: ````
+SYSTEM 
+SYSTEM Use the *FULL* file path, as shown to you by the user.
+SYSTEM 
+SYSTEM IMPORTANT: Use *quadruple* backticks ```` as fences, not triple backticks!
+SYSTEM 
+SYSTEM Every *SEARCH* section must *EXACTLY MATCH* the existing file content, character for character, including all comments, docstrings, etc.
+SYSTEM If the file contains code or other data wrapped/escaped in json/xml/quotes or other containers, you need to propose edits to the literal contents of the file, including the container markup.
+SYSTEM 
+SYSTEM *SEARCH/REPLACE* blocks will *only* replace the first match occurrence.
+SYSTEM Including multiple unique *SEARCH/REPLACE* blocks if needed.
+SYSTEM Include enough lines in each SEARCH section to uniquely match each set of lines that need to change.
+SYSTEM 
+SYSTEM Keep *SEARCH/REPLACE* blocks concise.
+SYSTEM Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
+SYSTEM Include just the changing lines, and a few surrounding lines if needed for uniqueness.
+SYSTEM Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
+SYSTEM 
+SYSTEM Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
+SYSTEM 
+SYSTEM To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+SYSTEM 
+SYSTEM Pay attention to which filenames the user wants you to edit, especially if they are asking you to create a new file.
+SYSTEM 
+SYSTEM If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
+SYSTEM - A new file path, including dir name if needed
+SYSTEM - An empty `SEARCH` section
+SYSTEM - The new file's contents in the `REPLACE` section
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+SYSTEM 
+-------
+USER Change get_factorial() to use math.factorial
+-------
+ASSISTANT To make this change we need to modify `mathweb/flask/app.py` to:
+ASSISTANT 
+ASSISTANT 1. Import the math package.
+ASSISTANT 2. Remove the existing factorial() function.
+ASSISTANT 3. Update get_factorial() to call math.factorial instead.
+ASSISTANT 
+ASSISTANT Here are the *SEARCH/REPLACE* blocks:
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ````python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT from flask import Flask
+ASSISTANT =======
+ASSISTANT import math
+ASSISTANT from flask import Flask
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ````python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def factorial(n):
+ASSISTANT     "compute factorial"
+ASSISTANT 
+ASSISTANT     if n == 0:
+ASSISTANT         return 1
+ASSISTANT     else:
+ASSISTANT         return n * factorial(n-1)
+ASSISTANT 
+ASSISTANT =======
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ````python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT     return str(factorial(n))
+ASSISTANT =======
+ASSISTANT     return str(math.factorial(n))
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+-------
+USER Refactor hello() into its own file.
+-------
+ASSISTANT To make this change we need to modify `main.py` and make a new file `hello.py`:
+ASSISTANT 
+ASSISTANT 1. Make a new hello.py file with hello() in it.
+ASSISTANT 2. Remove hello() from main.py and replace it with an import.
+ASSISTANT 
+ASSISTANT Here are the *SEARCH/REPLACE* blocks:
+ASSISTANT 
+ASSISTANT hello.py
+ASSISTANT ````python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT def hello():
+ASSISTANT     "print a greeting"
+ASSISTANT 
+ASSISTANT     print("hello")
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT main.py
+ASSISTANT ````python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def hello():
+ASSISTANT     "print a greeting"
+ASSISTANT 
+ASSISTANT     print("hello")
+ASSISTANT =======
+ASSISTANT from hello import hello
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Since this is the initial implementation, I am providing instructions to create all required files. 
+USER 
+USER ### 1. Project Configuration
+USER 
+USER **Create `pom.xml`**
+USER ```xml
+USER <?xml version="1.0" encoding="UTF-8"?>
+USER <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+USER 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+USER 	<modelVersion>4.0.0</modelVersion>
+USER 	<parent>
+USER 		<groupId>org.springframework.boot</groupId>
+USER 		<artifactId>spring-boot-starter-parent</artifactId>
+USER 		<version>3.2.0</version>
+USER 		<relativePath/>
+USER 	</parent>
+USER 	<groupId>com.addressbook</groupId>
+USER 	<artifactId>address-book</artifactId>
+USER 	<version>0.0.1-SNAPSHOT</version>
+USER 	<name>address-book</name>
+USER 	<description>Address Book Web Application</description>
+USER 	<properties>
+USER 		<java.version>17</java.version>
+USER 	</properties>
+USER 	<dependencies>
+USER 		<dependency>
+USER 			<groupId>org.springframework.boot</groupId>
+USER 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+USER 		</dependency>
+USER 		<dependency>
+USER 			<groupId>org.springframework.boot</groupId>
+USER 			<artifactId>spring-boot-starter-web</artifactId>
+USER 		</dependency>
+USER 		<dependency>
+USER 			<groupId>org.springframework.boot</groupId>
+USER 			<artifactId>spring-boot-starter-validation</artifactId>
+USER 		</dependency>
+USER 		<dependency>
+USER 			<groupId>com.h2database</groupId>
+USER 			<artifactId>h2</artifactId>
+USER 			<scope>runtime</scope>
+USER 		</dependency>
+USER 		<dependency>
+USER 			<groupId>org.springframework.boot</groupId>
+USER 			<artifactId>spring-boot-starter-test</artifactId>
+USER 			<scope>test</scope>
+USER 		</dependency>
+USER 	</dependencies>
+USER 	<build>
+USER 		<plugins>
+USER 			<plugin>
+USER 				<groupId>org.springframework.boot</groupId>
+USER 				<artifactId>spring-boot-maven-plugin</artifactId>
+USER 			</plugin>
+USER 		</plugins>
+USER 	</build>
+USER </project>
+USER ```
+USER 
+USER **Create `src/main/resources/application.yml`**
+USER ```yaml
+USER spring:
+USER   datasource:
+USER     url: jdbc:h2:mem:addressbookdb
+USER     driverClassName: org.h2.Driver
+USER     username: sa
+USER     password: 
+USER   jpa:
+USER     database-platform: org.hibernate.dialect.H2Dialect
+USER     hibernate:
+USER       ddl-auto: update
+USER     show-sql: true
+USER   h2:
+USER     console:
+USER       enabled: true
+USER ```
+USER 
+USER ### 2. Backend Implementation
+USER 
+USER **Create `src/main/java/com/addressbook/model/Contact.java`**
+USER ```java
+USER package com.addressbook.model;
+USER 
+USER import jakarta.persistence.*;
+USER import jakarta.validation.constraints.*;
+USER 
+USER @Entity
+USER public class Contact {
+USER     @Id
+USER     @GeneratedValue(strategy = GenerationType.IDENTITY)
+USER     private Long id;
+USER 
+USER     @NotBlank @Size(max = 50)
+USER     private String firstName;
+USER 
+USER     @NotBlank @Size(max = 50)
+USER     private String lastName;
+USER 
+USER     @NotBlank @Email @Size(max = 100)
+USER     private String email;
+USER 
+USER     @NotBlank @Size(max = 20)
+USER     private String phoneNumber;
+USER 
+USER     @NotBlank @Size(max = 255)
+USER     private String address;
+USER 
+USER     @NotBlank @Size(max = 50)
+USER     private String category;
+USER 
+USER     // Constructors
+USER     public Contact() {}
+USER 
+USER     public Contact(String firstName, String lastName, String email, String phoneNumber, String address, String category) {
+USER         this.firstName = firstName;
+USER         this.lastName = lastName;
+USER         this.email = email;
+USER         this.phoneNumber = phoneNumber;
+USER         this.address = address;
+USER         this.category = category;
+USER     }
+USER 
+USER     // Getters and Setters
+USER     public Long getId() { return id; }
+USER     public void setId(Long id) { this.id = id; }
+USER     public String getFirstName() { return firstName; }
+USER     public void setFirstName(String firstName) { this.firstName = firstName; }
+USER     public String getLastName() { return lastName; }
+USER     public void setLastName(String lastName) { this.lastName = lastName; }
+USER     public String getEmail() { return email; }
+USER     public void setEmail(String email) { this.email = email; }
+USER     public String getPhoneNumber() { return phoneNumber; }
+USER     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+USER     public String getAddress() { return address; }
+USER     public void setAddress(String address) { this.address = address; }
+USER     public String getCategory() { return category; }
+USER     public void setCategory(String category) { this.category = category; }
+USER }
+USER ```
+USER 
+USER **Create `src/main/java/com/addressbook/repository/ContactRepository.java`**
+USER ```java
+USER package com.addressbook.repository;
+USER 
+USER import com.addressbook.model.Contact;
+USER import org.springframework.data.jpa.repository.JpaRepository;
+USER import org.springframework.data.jpa.repository.Query;
+USER import org.springframework.data.repository.query.Param;
+USER import java.util.List;
+USER 
+USER public interface ContactRepository extends JpaRepository<Contact, Long> {
+USER     @Query("SELECT c FROM Contact c WHERE " +
+USER            "LOWER(c.firstName) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+USER            "LOWER(c.lastName) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+USER            "LOWER(c.category) LIKE LOWER(CONCAT('%', :q, '%'))")
+USER     List<Contact> search(@Param("q") String query);
+USER }
+USER ```
+USER 
+USER **Create `src/main/java/com/addressbook/service/ContactService.java`**
+USER ```java
+USER package com.addressbook.service;
+USER 
+USER import com.addressbook.model.Contact;
+USER import com.addressbook.repository.ContactRepository;
+USER import org.springframework.stereotype.Service;
+USER import java.util.List;
+USER 
+USER @Service
+USER public class ContactService {
+USER     private final ContactRepository repository;
+USER 
+USER     public ContactService(ContactRepository repository) {
+USER         this.repository = repository;
+USER     }
+USER 
+USER     public List<Contact> getAllContacts() { return repository.findAll(); }
+USER     public Contact getContactById(Long id) { return repository.findById(id).orElseThrow(); }
+USER     public Contact createContact(Contact contact) { return repository.save(contact); }
+USER     public Contact updateContact(Long id, Contact details) {
+USER         Contact contact = getContactById(id);
+USER         contact.setFirstName(details.getFirstName());
+USER         contact.setLastName(details.getLastName());
+USER         contact.setEmail(details.getEmail());
+USER         contact.setPhoneNumber(details.getPhoneNumber());
+USER         contact.setAddress(details.getAddress());
+USER         contact.setCategory(details.getCategory());
+USER         return repository.save(contact);
+USER     }
+USER     public void deleteContact(Long id) { repository.deleteById(id); }
+USER     public List<Contact> searchContacts(String query) { return repository.search(query); }
+USER }
+USER ```
+USER 
+USER **Create `src/main/java/com/addressbook/controller/ContactController.java`**
+USER ```java
+USER package com.addressbook.controller;
+USER 
+USER import com.addressbook.model.Contact;
+USER import com.addressbook.service.ContactService;
+USER import jakarta.validation.Valid;
+USER import org.springframework.http.HttpStatus;
+USER import org.springframework.http.ResponseEntity;
+USER import org.springframework.web.bind.annotation.*;
+USER 
+USER import java.util.List;
+USER 
+USER @RestController
+USER @RequestMapping("/api/contacts")
+USER @CrossOrigin("*")
+USER public class ContactController {
+USER     private final ContactService service;
+USER 
+USER     public ContactController(ContactService service) {
+USER         this.service = service;
+USER     }
+USER 
+USER     @GetMapping
+USER     public List<Contact> getAll() { return service.getAllContacts(); }
+USER 
+USER     @GetMapping("/{id}")
+USER     public Contact getById(@PathVariable Long id) { return service.getContactById(id); }
+USER 
+USER     @PostMapping
+USER     @ResponseStatus(HttpStatus.CREATED)
+USER     public Contact create(@Valid @RequestBody Contact contact) { return service.createContact(contact); }
+USER 
+USER     @PutMapping("/{id}")
+USER     public Contact update(@PathVariable Long id, @Valid @RequestBody Contact contact) {
+USER         return service.updateContact(id, contact);
+USER     }
+USER 
+USER     @DeleteMapping("/{id}")
+USER     @ResponseStatus(HttpStatus.NO_CONTENT)
+USER     public void delete(@PathVariable Long id) { service.deleteContact(id); }
+USER 
+USER     @GetMapping("/search")
+USER     public List<Contact> search(@RequestParam String q) { return service.searchContacts(q); }
+USER }
+USER ```
+USER 
+USER **Create `src/main/java/com/addressbook/config/DatabaseInitializer.java`**
+USER ```java
+USER package com.addressbook.config;
+USER 
+USER import com.addressbook.model.Contact;
+USER import com.addressbook.repository.ContactRepository;
+USER import org.springframework.boot.CommandLineRunner;
+USER import org.springframework.stereotype.Component;
+USER import java.util.List;
+USER 
+USER @Component
+USER public class DatabaseInitializer implements CommandLineRunner {
+USER     private final ContactRepository repository;
+USER 
+USER     public DatabaseInitializer(ContactRepository repository) {
+USER         this.repository = repository;
+USER     }
+USER 
+USER     @Override
+USER     public void run(String... args) {
+USER         repository.saveAll(List.of(
+USER             new Contact("John", "Doe", "john@example.com", "1234567890", "123 Main St", "Family"),
+USER             new Contact("Jane", "Smith", "jane@example.com", "0987654321", "456 Oak Ave", "Work"),
+USER             new Contact("Alice", "Johnson", "alice@example.com", "1122334455", "789 Pine Rd", "Friend"),
+USER             new Contact("Bob", "Brown", "bob@example.com", "5566778899", "321 Elm St", "Work"),
+USER             new Contact("Charlie", "Davis", "charlie@example.com", "9988776655", "654 Maple Dr", "Family")
+USER         ));
+USER     }
+USER }
+USER ```
+USER 
+USER **Create `src/main/java/com/addressbook/AddressBookApplication.java`**
+USER ```java
+USER package com.addressbook;
+USER 
+USER import org.springframework.boot.SpringApplication;
+USER import org.springframework.boot.autoconfigure.SpringBootApplication;
+USER 
+USER @SpringBootApplication
+USER public class AddressBookApplication {
+USER 	public static void main(String[] args) {
+USER 		SpringApplication.run(AddressBookApplication.class, args);
+USER 	}
+USER }
+USER ```
+USER 
+USER ### 3. Frontend Implementation
+USER 
+USER **Create `src/main/resources/static/index.html`**
+USER ```html
+USER <!DOCTYPE html>
+USER <html lang="en">
+USER <head>
+USER     <meta charset="UTF-8">
+USER     <title>Address Book</title>
+USER     <link rel="stylesheet" href="css/styles.css">
+USER </head>
+USER <body>
+USER     <div class="container">
+USER         <h1>Address Book</h1>
+USER         
+USER         <div class="search-bar">
+USER             <input type="text" id="searchInput" placeholder="Search by name or category...">
+USER             <button onclick="searchContacts()">Search</button>
+USER         </div>
+USER 
+USER         <form id="contactForm">
+USER             <input type="hidden" id="contactId">
+USER             <input type="text" id="firstName" placeholder="First Name" required>
+USER             <input type="text" id="lastName" placeholder="Last Name" required>
+USER             <input type="email" id="email" placeholder="Email" required>
+USER             <input type="text" id="phoneNumber" placeholder="Phone Number" required>
+USER             <input type="text" id="address" placeholder="Address" required>
+USER             <input type="text" id="category" placeholder="Category (e.g. Family)" required>
+USER             <button type="submit" id="submitBtn">Add Contact</button>
+USER             <button type="button" id="cancelBtn" onclick="resetForm()" style="display:none;">Cancel</button>
+USER         </form>
+USER 
+USER         <table id="contactTable">
+USER             <thead>
+USER                 <tr>
+USER                     <th>Name</th>
+USER                     <th>Email</th>
+USER                     <th>Phone</th>
+USER                     <th>Category</th>
+USER                     <th>Actions</th>
+USER                 </tr>
+USER             </thead>
+USER             <tbody id="contactList"></tbody>
+USER         </table>
+USER     </div>
+USER     <script src="js/app.js"></script>
+USER </body>
+USER </html>
+USER ```
+USER 
+USER **Create `src/main/resources/static/css/styles.css`**
+USER ```css
+USER body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+USER .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+USER form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+USER form input, form button { padding: 8px; }
+USER form button { grid-column: span 2; background: #28a745; color: white; border: none; cursor: pointer; }
+USER #cancelBtn { background: #dc3545; }
+USER .search-bar { margin-bottom: 20px; display: flex; gap: 10px; }
+USER .search-bar input { flex-grow: 1; padding: 8px; }
+USER table { width: 100%; border-collapse: collapse; }
+USER th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+USER button.edit-btn { background: #ffc107; border: none; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
+USER button.delete-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+USER ```
+USER 
+USER **Create `src/main/resources/static/js/app.js`**
+USER ```javascript
+USER const API_URL = '/api/contacts';
+USER const contactForm = document.getElementById('contactForm');
+USER const contactList = document.getElementById('contactList');
+USER 
+USER document.addEventListener('DOMContentLoaded', fetchContacts);
+USER 
+USER contactForm.addEventListener('submit', async (e) => {
+USER     e.preventDefault();
+USER     const id = document.getElementById('contactId').value;
+USER     const contact = {
+USER         firstName: document.getElementById('firstName').value,
+USER         lastName: document.getElementById('lastName').value,
+USER         email: document.getElementById('email').value,
+USER         phoneNumber: document.getElementById('phoneNumber').value,
+USER         address: document.getElementById('address').value,
+USER         category: document.getElementById('category').value
+USER     };
+USER 
+USER     const method = id ? 'PUT' : 'POST';
+USER     const url = id ? `${API_URL}/${id}` : API_URL;
+USER 
+USER     await fetch(url, {
+USER         method,
+USER         headers: { 'Content-Type': 'application/json' },
+USER         body: JSON.stringify(contact)
+USER     });
+USER 
+USER     resetForm();
+USER     fetchContacts();
+USER });
+USER 
+USER async function fetchContacts() {
+USER     const res = await fetch(API_URL);
+USER     const contacts = await res.json();
+USER     renderContacts(contacts);
+USER }
+USER 
+USER async function searchContacts() {
+USER     const query = document.getElementById('searchInput').value;
+USER     const res = await fetch(`${API_URL}/search?q=${encodeURIComponent(query)}`);
+USER     const contacts = await res.json();
+USER     renderContacts(contacts);
+USER }
+USER 
+USER function renderContacts(contacts) {
+USER     contactList.innerHTML = '';
+USER     contacts.forEach(c => {
+USER         const tr = document.createElement('tr');
+USER         tr.innerHTML = `
+USER             <td>${c.firstName} ${c.lastName}</td>
+USER             <td>${c.email}</td>
+USER             <td>${c.phoneNumber}</td>
+USER             <td>${c.category}</td>
+USER             <td>
+USER                 <button class="edit-btn" onclick="editContact(${c.id})">Edit</button>
+USER                 <button class="delete-btn" onclick="deleteContact(${c.id})">Delete</button>
+USER             </td>
+USER         `;
+USER         contactList.appendChild(tr);
+USER     });
+USER }
+USER 
+USER async function deleteContact(id) {
+USER     if (confirm('Delete this contact?')) {
+USER         await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+USER         fetchContacts();
+USER     }
+USER }
+USER 
+USER async function editContact(id) {
+USER     const res = await fetch(`${API_URL}/${id}`);
+USER     const c = await res.json();
+USER     document.getElementById('contactId').value = c.id;
+USER     document.getElementById('firstName').value = c.firstName;
+USER     document.getElementById('lastName').value = c.lastName;
+USER     document.getElementById('email').value = c.email;
+USER     document.getElementById('phoneNumber').value = c.phoneNumber;
+USER     document.getElementById('address').value = c.address;
+USER     document.getElementById('category').value = c.category;
+USER     document.getElementById('submitBtn').innerText = 'Update Contact';
+USER     document.getElementById('cancelBtn').style.display = 'inline-block';
+USER }
+USER 
+USER function resetForm() {
+USER     contactForm.reset();
+USER     document.getElementById('contactId').value = '';
+USER     document.getElementById('submitBtn').innerText = 'Add Contact';
+USER     document.getElementById('cancelBtn').style.display = 'none';
+USER }
+USER ```
+-------
+ASSISTANT pom.xml
+ASSISTANT ````xml
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT <?xml version="1.0" encoding="UTF-8"?>
+ASSISTANT <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ASSISTANT 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+ASSISTANT 	<modelVersion>4.0.0</modelVersion>
+ASSISTANT 	<parent>
+ASSISTANT 		<groupId>org.springframework.boot</groupId>
+ASSISTANT 		<artifactId>spring-boot-starter-parent</artifactId>
+ASSISTANT 		<version>3.2.0</version>
+ASSISTANT 		<relativePath/>
+ASSISTANT 	</parent>
+ASSISTANT 	<groupId>com.addressbook</groupId>
+ASSISTANT 	<artifactId>address-book</artifactId>
+ASSISTANT 	<version>0.0.1-SNAPSHOT</version>
+ASSISTANT 	<name>address-book</name>
+ASSISTANT 	<description>Address Book Web Application</description>
+ASSISTANT 	<properties>
+ASSISTANT 		<java.version>17</java.version>
+ASSISTANT 	</properties>
+ASSISTANT 	<dependencies>
+ASSISTANT 		<dependency>
+ASSISTANT 			<groupId>org.springframework.boot</groupId>
+ASSISTANT 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+ASSISTANT 		</dependency>
+ASSISTANT 		<dependency>
+ASSISTANT 			<groupId>org.springframework.boot</groupId>
+ASSISTANT 			<artifactId>spring-boot-starter-web</artifactId>
+ASSISTANT 		</dependency>
+ASSISTANT 		<dependency>
+ASSISTANT 			<groupId>org.springframework.boot</groupId>
+ASSISTANT 			<artifactId>spring-boot-starter-validation</artifactId>
+ASSISTANT 		</dependency>
+ASSISTANT 		<dependency>
+ASSISTANT 			<groupId>com.h2database</groupId>
+ASSISTANT 			<artifactId>h2</artifactId>
+ASSISTANT 			<scope>runtime</scope>
+ASSISTANT 		</dependency>
+ASSISTANT 		<dependency>
+ASSISTANT 			<groupId>org.springframework.boot</groupId>
+ASSISTANT 			<artifactId>spring-boot-starter-test</artifactId>
+ASSISTANT 			<scope>test</scope>
+ASSISTANT 		</dependency>
+ASSISTANT 	</dependencies>
+ASSISTANT 	<build>
+ASSISTANT 		<plugins>
+ASSISTANT 			<plugin>
+ASSISTANT 				<groupId>org.springframework.boot</groupId>
+ASSISTANT 				<artifactId>spring-boot-maven-plugin</artifactId>
+ASSISTANT 			</plugin>
+ASSISTANT 		</plugins>
+ASSISTANT 	</build>
+ASSISTANT </project>
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/resources/application.yml
+ASSISTANT ````yaml
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT spring:
+ASSISTANT   datasource:
+ASSISTANT     url: jdbc:h2:mem:addressbookdb
+ASSISTANT     driverClassName: org.h2.Driver
+ASSISTANT     username: sa
+ASSISTANT     password: 
+ASSISTANT   jpa:
+ASSISTANT     database-platform: org.hibernate.dialect.H2Dialect
+ASSISTANT     hibernate:
+ASSISTANT       ddl-auto: update
+ASSISTANT     show-sql: true
+ASSISTANT   h2:
+ASSISTANT     console:
+ASSISTANT       enabled: true
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/java/com/addressbook/model/Contact.java
+ASSISTANT ````java
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT package com.addressbook.model;
+ASSISTANT 
+ASSISTANT import jakarta.persistence.*;
+ASSISTANT import jakarta.validation.constraints.*;
+ASSISTANT 
+ASSISTANT @Entity
+ASSISTANT public class Contact {
+ASSISTANT     @Id
+ASSISTANT     @GeneratedValue(strategy = GenerationType.IDENTITY)
+ASSISTANT     private Long id;
+ASSISTANT 
+ASSISTANT     @NotBlank @Size(max = 50)
+ASSISTANT     private String firstName;
+ASSISTANT 
+ASSISTANT     @NotBlank @Size(max = 50)
+ASSISTANT     private String lastName;
+ASSISTANT 
+ASSISTANT     @NotBlank @Email @Size(max = 100)
+ASSISTANT     private String email;
+ASSISTANT 
+ASSISTANT     @NotBlank @Size(max = 20)
+ASSISTANT     private String phoneNumber;
+ASSISTANT 
+ASSISTANT     @NotBlank @Size(max = 255)
+ASSISTANT     private String address;
+ASSISTANT 
+ASSISTANT     @NotBlank @Size(max = 50)
+ASSISTANT     private String category;
+ASSISTANT 
+ASSISTANT     // Constructors
+ASSISTANT     public Contact() {}
+ASSISTANT 
+ASSISTANT     public Contact(String firstName, String lastName, String email, String phoneNumber, String address, String category) {
+ASSISTANT         this.firstName = firstName;
+ASSISTANT         this.lastName = lastName;
+ASSISTANT         this.email = email;
+ASSISTANT         this.phoneNumber = phoneNumber;
+ASSISTANT         this.address = address;
+ASSISTANT         this.category = category;
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     // Getters and Setters
+ASSISTANT     public Long getId() { return id; }
+ASSISTANT     public void setId(Long id) { this.id = id; }
+ASSISTANT     public String getFirstName() { return firstName; }
+ASSISTANT     public void setFirstName(String firstName) { this.firstName = firstName; }
+ASSISTANT     public String getLastName() { return lastName; }
+ASSISTANT     public void setLastName(String lastName) { this.lastName = lastName; }
+ASSISTANT     public String getEmail() { return email; }
+ASSISTANT     public void setEmail(String email) { this.email = email; }
+ASSISTANT     public String getPhoneNumber() { return phoneNumber; }
+ASSISTANT     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+ASSISTANT     public String getAddress() { return address; }
+ASSISTANT     public void setAddress(String address) { this.address = address; }
+ASSISTANT     public String getCategory() { return category; }
+ASSISTANT     public void setCategory(String category) { this.category = category; }
+ASSISTANT }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/java/com/addressbook/repository/ContactRepository.java
+ASSISTANT ````java
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT package com.addressbook.repository;
+ASSISTANT 
+ASSISTANT import com.addressbook.model.Contact;
+ASSISTANT import org.springframework.data.jpa.repository.JpaRepository;
+ASSISTANT import org.springframework.data.jpa.repository.Query;
+ASSISTANT import org.springframework.data.repository.query.Param;
+ASSISTANT import java.util.List;
+ASSISTANT 
+ASSISTANT public interface ContactRepository extends JpaRepository<Contact, Long> {
+ASSISTANT     @Query("SELECT c FROM Contact c WHERE " +
+ASSISTANT            "LOWER(c.firstName) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+ASSISTANT            "LOWER(c.lastName) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+ASSISTANT            "LOWER(c.category) LIKE LOWER(CONCAT('%', :q, '%'))")
+ASSISTANT     List<Contact> search(@Param("q") String query);
+ASSISTANT }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/java/com/addressbook/service/ContactService.java
+ASSISTANT ````java
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT package com.addressbook.service;
+ASSISTANT 
+ASSISTANT import com.addressbook.model.Contact;
+ASSISTANT import com.addressbook.repository.ContactRepository;
+ASSISTANT import org.springframework.stereotype.Service;
+ASSISTANT import java.util.List;
+ASSISTANT 
+ASSISTANT @Service
+ASSISTANT public class ContactService {
+ASSISTANT     private final ContactRepository repository;
+ASSISTANT 
+ASSISTANT     public ContactService(ContactRepository repository) {
+ASSISTANT         this.repository = repository;
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     public List<Contact> getAllContacts() { return repository.findAll(); }
+ASSISTANT     public Contact getContactById(Long id) { return repository.findById(id).orElseThrow(); }
+ASSISTANT     public Contact createContact(Contact contact) { return repository.save(contact); }
+ASSISTANT     public Contact updateContact(Long id, Contact details) {
+ASSISTANT         Contact contact = getContactById(id);
+ASSISTANT         contact.setFirstName(details.getFirstName());
+ASSISTANT         contact.setLastName(details.getLastName());
+ASSISTANT         contact.setEmail(details.getEmail());
+ASSISTANT         contact.setPhoneNumber(details.getPhoneNumber());
+ASSISTANT         contact.setAddress(details.getAddress());
+ASSISTANT         contact.setCategory(details.getCategory());
+ASSISTANT         return repository.save(contact);
+ASSISTANT     }
+ASSISTANT     public void deleteContact(Long id) { repository.deleteById(id); }
+ASSISTANT     public List<Contact> searchContacts(String query) { return repository.search(query); }
+ASSISTANT }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/java/com/addressbook/controller/ContactController.java
+ASSISTANT ````java
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT package com.addressbook.controller;
+ASSISTANT 
+ASSISTANT import com.addressbook.model.Contact;
+ASSISTANT import com.addressbook.service.ContactService;
+ASSISTANT import jakarta.validation.Valid;
+ASSISTANT import org.springframework.http.HttpStatus;
+ASSISTANT import org.springframework.http.ResponseEntity;
+ASSISTANT import org.springframework.web.bind.annotation.*;
+ASSISTANT 
+ASSISTANT import java.util.List;
+ASSISTANT 
+ASSISTANT @RestController
+ASSISTANT @RequestMapping("/api/contacts")
+ASSISTANT @CrossOrigin("*")
+ASSISTANT public class ContactController {
+ASSISTANT     private final ContactService service;
+ASSISTANT 
+ASSISTANT     public ContactController(ContactService service) {
+ASSISTANT         this.service = service;
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     @GetMapping
+ASSISTANT     public List<Contact> getAll() { return service.getAllContacts(); }
+ASSISTANT 
+ASSISTANT     @GetMapping("/{id}")
+ASSISTANT     public Contact getById(@PathVariable Long id) { return service.getContactById(id); }
+ASSISTANT 
+ASSISTANT     @PostMapping
+ASSISTANT     @ResponseStatus(HttpStatus.CREATED)
+ASSISTANT     public Contact create(@Valid @RequestBody Contact contact) { return service.createContact(contact); }
+ASSISTANT 
+ASSISTANT     @PutMapping("/{id}")
+ASSISTANT     public Contact update(@PathVariable Long id, @Valid @RequestBody Contact contact) {
+ASSISTANT         return service.updateContact(id, contact);
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     @DeleteMapping("/{id}")
+ASSISTANT     @ResponseStatus(HttpStatus.NO_CONTENT)
+ASSISTANT     public void delete(@PathVariable Long id) { service.deleteContact(id); }
+ASSISTANT 
+ASSISTANT     @GetMapping("/search")
+ASSISTANT     public List<Contact> search(@RequestParam String q) { return service.searchContacts(q); }
+ASSISTANT }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/java/com/addressbook/config/DatabaseInitializer.java
+ASSISTANT ````java
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT package com.addressbook.config;
+ASSISTANT 
+ASSISTANT import com.addressbook.model.Contact;
+ASSISTANT import com.addressbook.repository.ContactRepository;
+ASSISTANT import org.springframework.boot.CommandLineRunner;
+ASSISTANT import org.springframework.stereotype.Component;
+ASSISTANT import java.util.List;
+ASSISTANT 
+ASSISTANT @Component
+ASSISTANT public class DatabaseInitializer implements CommandLineRunner {
+ASSISTANT     private final ContactRepository repository;
+ASSISTANT 
+ASSISTANT     public DatabaseInitializer(ContactRepository repository) {
+ASSISTANT         this.repository = repository;
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     @Override
+ASSISTANT     public void run(String... args) {
+ASSISTANT         repository.saveAll(List.of(
+ASSISTANT             new Contact("John", "Doe", "john@example.com", "1234567890", "123 Main St", "Family"),
+ASSISTANT             new Contact("Jane", "Smith", "jane@example.com", "0987654321", "456 Oak Ave", "Work"),
+ASSISTANT             new Contact("Alice", "Johnson", "alice@example.com", "1122334455", "789 Pine Rd", "Friend"),
+ASSISTANT             new Contact("Bob", "Brown", "bob@example.com", "5566778899", "321 Elm St", "Work"),
+ASSISTANT             new Contact("Charlie", "Davis", "charlie@example.com", "9988776655", "654 Maple Dr", "Family")
+ASSISTANT         ));
+ASSISTANT     }
+ASSISTANT }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/java/com/addressbook/AddressBookApplication.java
+ASSISTANT ````java
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT package com.addressbook;
+ASSISTANT 
+ASSISTANT import org.springframework.boot.SpringApplication;
+ASSISTANT import org.springframework.boot.autoconfigure.SpringBootApplication;
+ASSISTANT 
+ASSISTANT @SpringBootApplication
+ASSISTANT public class AddressBookApplication {
+ASSISTANT 	public static void main(String[] args) {
+ASSISTANT 		SpringApplication.run(AddressBookApplication.class, args);
+ASSISTANT 	}
+ASSISTANT }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/resources/static/index.html
+ASSISTANT ````html
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT <!DOCTYPE html>
+ASSISTANT <html lang="en">
+ASSISTANT <head>
+ASSISTANT     <meta charset="UTF-8">
+ASSISTANT     <title>Address Book</title>
+ASSISTANT     <link rel="stylesheet" href="css/styles.css">
+ASSISTANT </head>
+ASSISTANT <body>
+ASSISTANT     <div class="container">
+ASSISTANT         <h1>Address Book</h1>
+ASSISTANT         
+ASSISTANT         <div class="search-bar">
+ASSISTANT             <input type="text" id="searchInput" placeholder="Search by name or category...">
+ASSISTANT             <button onclick="searchContacts()">Search</button>
+ASSISTANT         </div>
+ASSISTANT 
+ASSISTANT         <form id="contactForm">
+ASSISTANT             <input type="hidden" id="contactId">
+ASSISTANT             <input type="text" id="firstName" placeholder="First Name" required>
+ASSISTANT             <input type="text" id="lastName" placeholder="Last Name" required>
+ASSISTANT             <input type="email" id="email" placeholder="Email" required>
+ASSISTANT             <input type="text" id="phoneNumber" placeholder="Phone Number" required>
+ASSISTANT             <input type="text" id="address" placeholder="Address" required>
+ASSISTANT             <input type="text" id="category" placeholder="Category (e.g. Family)" required>
+ASSISTANT             <button type="submit" id="submitBtn">Add Contact</button>
+ASSISTANT             <button type="button" id="cancelBtn" onclick="resetForm()" style="display:none;">Cancel</button>
+ASSISTANT         </form>
+ASSISTANT 
+ASSISTANT         <table id="contactTable">
+ASSISTANT             <thead>
+ASSISTANT                 <tr>
+ASSISTANT                     <th>Name</th>
+ASSISTANT                     <th>Email</th>
+ASSISTANT                     <th>Phone</th>
+ASSISTANT                     <th>Category</th>
+ASSISTANT                     <th>Actions</th>
+ASSISTANT                 </tr>
+ASSISTANT             </thead>
+ASSISTANT             <tbody id="contactList"></tbody>
+ASSISTANT         </table>
+ASSISTANT     </div>
+ASSISTANT     <script src="js/app.js"></script>
+ASSISTANT </body>
+ASSISTANT </html>
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/resources/static/css/styles.css
+ASSISTANT ````css
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+ASSISTANT .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+ASSISTANT form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+ASSISTANT form input, form button { padding: 8px; }
+ASSISTANT form button { grid-column: span 2; background: #28a745; color: white; border: none; cursor: pointer; }
+ASSISTANT #cancelBtn { background: #dc3545; }
+ASSISTANT .search-bar { margin-bottom: 20px; display: flex; gap: 10px; }
+ASSISTANT .search-bar input { flex-grow: 1; padding: 8px; }
+ASSISTANT table { width: 100%; border-collapse: collapse; }
+ASSISTANT th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+ASSISTANT button.edit-btn { background: #ffc107; border: none; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
+ASSISTANT button.delete-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+ASSISTANT 
+ASSISTANT src/main/resources/static/js/app.js
+ASSISTANT ````javascript
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT const API_URL = '/api/contacts';
+ASSISTANT const contactForm = document.getElementById('contactForm');
+ASSISTANT const contactList = document.getElementById('contactList');
+ASSISTANT 
+ASSISTANT document.addEventListener('DOMContentLoaded', fetchContacts);
+ASSISTANT 
+ASSISTANT contactForm.addEventListener('submit', async (e) => {
+ASSISTANT     e.preventDefault();
+ASSISTANT     const id = document.getElementById('contactId').value;
+ASSISTANT     const contact = {
+ASSISTANT         firstName: document.getElementById('firstName').value,
+ASSISTANT         lastName: document.getElementById('lastName').value,
+ASSISTANT         email: document.getElementById('email').value,
+ASSISTANT         phoneNumber: document.getElementById('phoneNumber').value,
+ASSISTANT         address: document.getElementById('address').value,
+ASSISTANT         category: document.getElementById('category').value
+ASSISTANT     };
+ASSISTANT 
+ASSISTANT     const method = id ? 'PUT' : 'POST';
+ASSISTANT     const url = id ? `${API_URL}/${id}` : API_URL;
+ASSISTANT 
+ASSISTANT     await fetch(url, {
+ASSISTANT         method,
+ASSISTANT         headers: { 'Content-Type': 'application/json' },
+ASSISTANT         body: JSON.stringify(contact)
+ASSISTANT     });
+ASSISTANT 
+ASSISTANT     resetForm();
+ASSISTANT     fetchContacts();
+ASSISTANT });
+ASSISTANT 
+ASSISTANT async function fetchContacts() {
+ASSISTANT     const res = await fetch(API_URL);
+ASSISTANT     const contacts = await res.json();
+ASSISTANT     renderContacts(contacts);
+ASSISTANT }
+ASSISTANT 
+ASSISTANT async function searchContacts() {
+ASSISTANT     const query = document.getElementById('searchInput').value;
+ASSISTANT     const res = await fetch(`${API_URL}/search?q=${encodeURIComponent(query)}`);
+ASSISTANT     const contacts = await res.json();
+ASSISTANT     renderContacts(contacts);
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function renderContacts(contacts) {
+ASSISTANT     contactList.innerHTML = '';
+ASSISTANT     contacts.forEach(c => {
+ASSISTANT         const tr = document.createElement('tr');
+ASSISTANT         tr.innerHTML = `
+ASSISTANT             <td>${c.firstName} ${c.lastName}</td>
+ASSISTANT             <td>${c.email}</td>
+ASSISTANT             <td>${c.phoneNumber}</td>
+ASSISTANT             <td>${c.category}</td>
+ASSISTANT             <td>
+ASSISTANT                 <button class="edit-btn" onclick="editContact(${c.id})">Edit</button>
+ASSISTANT                 <button class="delete-btn" onclick="deleteContact(${c.id})">Delete</button>
+ASSISTANT             </td>
+ASSISTANT         `;
+ASSISTANT         contactList.appendChild(tr);
+ASSISTANT     });
+ASSISTANT }
+ASSISTANT 
+ASSISTANT async function deleteContact(id) {
+ASSISTANT     if (confirm('Delete this contact?')) {
+ASSISTANT         await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+ASSISTANT         fetchContacts();
+ASSISTANT     }
+ASSISTANT }
+ASSISTANT 
+ASSISTANT async function editContact(id) {
+ASSISTANT     const res = await fetch(`${API_URL}/${id}`);
+ASSISTANT     const c = await res.json();
+ASSISTANT     document.getElementById('contactId').value = c.id;
+ASSISTANT     document.getElementById('firstName').value = c.firstName;
+ASSISTANT     document.getElementById('lastName').value = c.lastName;
+ASSISTANT     document.getElementById('email').value = c.email;
+ASSISTANT     document.getElementById('phoneNumber').value = c.phoneNumber;
+ASSISTANT     document.getElementById('address').value = c.address;
+ASSISTANT     document.getElementById('category').value = c.category;
+ASSISTANT     document.getElementById('submitBtn').innerText = 'Update Contact';
+ASSISTANT     document.getElementById('cancelBtn').style.display = 'inline-block';
+ASSISTANT }
+ASSISTANT 
+ASSISTANT function resetForm() {
+ASSISTANT     contactForm.reset();
+ASSISTANT     document.getElementById('contactId').value = '';
+ASSISTANT     document.getElementById('submitBtn').innerText = 'Add Contact';
+ASSISTANT     document.getElementById('cancelBtn').style.display = 'none';
+ASSISTANT }
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ````
+-------
+USER I committed the changes with git hash d83182f & commit msg: aider: feat: implement initial address book application
+-------
+ASSISTANT Ok.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER src/main/resources/static/index.html
+USER ````
+USER <!DOCTYPE html>
+USER <html lang="en">
+USER <head>
+USER     <meta charset="UTF-8">
+USER     <title>Address Book</title>
+USER     <link rel="stylesheet" href="css/styles.css">
+USER </head>
+USER <body>
+USER     <div class="container">
+USER         <h1>Address Book</h1>
+USER         
+USER         <div class="search-bar">
+USER             <input type="text" id="searchInput" placeholder="Search by name or category...">
+USER             <button onclick="searchContacts()">Search</button>
+USER         </div>
+USER 
+USER         <form id="contactForm">
+USER             <input type="hidden" id="contactId">
+USER             <input type="text" id="firstName" placeholder="First Name" required>
+USER             <input type="text" id="lastName" placeholder="Last Name" required>
+USER             <input type="email" id="email" placeholder="Email" required>
+USER             <input type="text" id="phoneNumber" placeholder="Phone Number" required>
+USER             <input type="text" id="address" placeholder="Address" required>
+USER             <input type="text" id="category" placeholder="Category (e.g. Family)" required>
+USER             <button type="submit" id="submitBtn">Add Contact</button>
+USER             <button type="button" id="cancelBtn" onclick="resetForm()" style="display:none;">Cancel</button>
+USER         </form>
+USER 
+USER         <table id="contactTable">
+USER             <thead>
+USER                 <tr>
+USER                     <th>Name</th>
+USER                     <th>Email</th>
+USER                     <th>Phone</th>
+USER                     <th>Category</th>
+USER                     <th>Actions</th>
+USER                 </tr>
+USER             </thead>
+USER             <tbody id="contactList"></tbody>
+USER         </table>
+USER     </div>
+USER     <script src="js/app.js"></script>
+USER </body>
+USER </html>
+USER ````
+USER 
+USER src/main/resources/static/css/styles.css
+USER ````
+USER body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+USER .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+USER form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+USER form input, form button { padding: 8px; }
+USER form button { grid-column: span 2; background: #28a745; color: white; border: none; cursor: pointer; }
+USER #cancelBtn { background: #dc3545; }
+USER .search-bar { margin-bottom: 20px; display: flex; gap: 10px; }
+USER .search-bar input { flex-grow: 1; padding: 8px; }
+USER table { width: 100%; border-collapse: collapse; }
+USER th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+USER button.edit-btn { background: #ffc107; border: none; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
+USER button.delete-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+USER ````
+USER 
+USER src/main/java/com/addressbook/config/DatabaseInitializer.java
+USER ````
+USER package com.addressbook.config;
+USER 
+USER import com.addressbook.model.Contact;
+USER import com.addressbook.repository.ContactRepository;
+USER import org.springframework.boot.CommandLineRunner;
+USER import org.springframework.stereotype.Component;
+USER import java.util.List;
+USER 
+USER @Component
+USER public class DatabaseInitializer implements CommandLineRunner {
+USER     private final ContactRepository repository;
+USER 
+USER     public DatabaseInitializer(ContactRepository repository) {
+USER         this.repository = repository;
+USER     }
+USER 
+USER     @Override
+USER     public void run(String... args) {
+USER         repository.saveAll(List.of(
+USER             new Contact("John", "Doe", "john@example.com", "1234567890", "123 Main St", "Family"),
+USER             new Contact("Jane", "Smith", "jane@example.com", "0987654321", "456 Oak Ave", "Work"),
+USER             new Contact("Alice", "Johnson", "alice@example.com", "1122334455", "789 Pine Rd", "Friend"),
+USER             new Contact("Bob", "Brown", "bob@example.com", "5566778899", "321 Elm St", "Work"),
+USER             new Contact("Charlie", "Davis", "charlie@example.com", "9988776655", "654 Maple Dr", "Family")
+USER         ));
+USER     }
+USER }
+USER ````
+USER 
+USER src/main/java/com/addressbook/repository/ContactRepository.java
+USER ````
+USER package com.addressbook.repository;
+USER 
+USER import com.addressbook.model.Contact;
+USER import org.springframework.data.jpa.repository.JpaRepository;
+USER import org.springframework.data.jpa.repository.Query;
+USER import org.springframework.data.repository.query.Param;
+USER import java.util.List;
+USER 
+USER public interface ContactRepository extends JpaRepository<Contact, Long> {
+USER     @Query("SELECT c FROM Contact c WHERE " +
+USER            "LOWER(c.firstName) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+USER            "LOWER(c.lastName) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+USER            "LOWER(c.category) LIKE LOWER(CONCAT('%', :q, '%'))")
+USER     List<Contact> search(@Param("q") String query);
+USER }
+USER ````
+USER 
+USER src/main/java/com/addressbook/model/Contact.java
+USER ````
+USER package com.addressbook.model;
+USER 
+USER import jakarta.persistence.*;
+USER import jakarta.validation.constraints.*;
+USER 
+USER @Entity
+USER public class Contact {
+USER     @Id
+USER     @GeneratedValue(strategy = GenerationType.IDENTITY)
+USER     private Long id;
+USER 
+USER     @NotBlank @Size(max = 50)
+USER     private String firstName;
+USER 
+USER     @NotBlank @Size(max = 50)
+USER     private String lastName;
+USER 
+USER     @NotBlank @Email @Size(max = 100)
+USER     private String email;
+USER 
+USER     @NotBlank @Size(max = 20)
+USER     private String phoneNumber;
+USER 
+USER     @NotBlank @Size(max = 255)
+USER     private String address;
+USER 
+USER     @NotBlank @Size(max = 50)
+USER     private String category;
+USER 
+USER     // Constructors
+USER     public Contact() {}
+USER 
+USER     public Contact(String firstName, String lastName, String email, String phoneNumber, String address, String category) {
+USER         this.firstName = firstName;
+USER         this.lastName = lastName;
+USER         this.email = email;
+USER         this.phoneNumber = phoneNumber;
+USER         this.address = address;
+USER         this.category = category;
+USER     }
+USER 
+USER     // Getters and Setters
+USER     public Long getId() { return id; }
+USER     public void setId(Long id) { this.id = id; }
+USER     public String getFirstName() { return firstName; }
+USER     public void setFirstName(String firstName) { this.firstName = firstName; }
+USER     public String getLastName() { return lastName; }
+USER     public void setLastName(String lastName) { this.lastName = lastName; }
+USER     public String getEmail() { return email; }
+USER     public void setEmail(String email) { this.email = email; }
+USER     public String getPhoneNumber() { return phoneNumber; }
+USER     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+USER     public String getAddress() { return address; }
+USER     public void setAddress(String address) { this.address = address; }
+USER     public String getCategory() { return category; }
+USER     public void setCategory(String category) { this.category = category; }
+USER }
+USER ````
+USER 
+USER ARCHITECTURE.md
+USER ````
+USER # Address Book Web Application - Architecture Documentation
+USER 
+USER ## Section 1: Database Entity Mapping
+USER 
+USER | Field | Type | Constraints | Description |
+USER |-------|------|-------------|-------------|
+USER | `id` | Long | `@Id`, `@GeneratedValue`, non-null | Primary key, auto-increment |
+USER | `firstName` | String | `@NotBlank`, max 50 chars | Contact first name |
+USER | `lastName` | String | `@NotBlank`, max 50 chars | Contact last name |
+USER | `email` | String | `@NotBlank`, `@Email`, max 100 chars | Contact email address |
+USER | `phoneNumber` | String | `@NotBlank`, max 20 chars | Contact phone number |
+USER | `address` | String | `@NotBlank`, max 255 chars | Physical address |
+USER | `category` | String | `@NotBlank`, max 50 chars | Tag/Category (e.g., Family, Work) |
+USER 
+USER **Entity Location:** `src/main/java/com/addressbook/model/Contact.java`
+USER 
+USER ---
+USER 
+USER ## Section 2: REST API Endpoints Specification
+USER 
+USER **Base Path:** `/api/contacts`
+USER 
+USER | HTTP Method | Endpoint | Request Body | Response Body | Description |
+USER |-------------|----------|--------------|---------------|-------------|
+USER | `GET` | `/api/contacts` | None | `[Contact]` (array) | List all contacts |
+USER | `GET` | `/api/contacts/{id}` | None | `Contact` object | Get single contact by ID |
+USER | `POST` | `/api/contacts` | `Contact` JSON | `Contact` object | Create new contact |
+USER | `PUT` | `/api/contacts/{id}` | `Contact` JSON | `Contact` object | Update existing contact |
+USER | `DELETE` | `/api/contacts/{id}` | None | `204 No Content` | Delete contact by ID |
+USER | `GET` | `/api/contacts/search?q={query}` | None | `[Contact]` (array) | Search/filter by name or category |
+USER 
+USER ### POST Request/Response Example
+USER 
+USER **Request:**
+USER ```json
+USER POST /api/contacts
+USER Content-Type: application/json
+USER 
+USER {
+USER   "firstName": "John",
+USER   "lastName": "Doe",
+USER   "email": "john.doe@example.com",
+USER   "phoneNumber": "+1-555-1234",
+USER   "address": "123 Main Street, Anytown, USA",
+USER   "category": "Family"
+USER }
+USER ```
+USER 
+USER **Response:**
+USER ```json
+USER HTTP/1.1 201 Created
+USER Content-Type: application/json
+USER 
+USER {
+USER   "id": 1,
+USER   "firstName": "John",
+USER   "lastName": "Doe",
+USER   "email": "john.doe@example.com",
+USER   "phoneNumber": "+1-555-1234",
+USER   "address": "123 Main Street, Anytown, USA",
+USER   "category": "Family"
+USER }
+USER ```
+USER 
+USER ---
+USER 
+USER ## Section 3: Project Directory Layout
+USER 
+USER ```
+USER address-book/
+USER ├── pom.xml
+USER ├── src/
+USER │   ├── main/
+USER │   │   ├── java/com/addressbook/
+USER │   │   │   ├── AddressBookApplication.java
+USER │   │   │   ├── config/DatabaseInitializer.java
+USER │   │   │   ├── controller/ContactController.java
+USER │   │   │   ├── model/Contact.java
+USER │   │   │   ├── repository/ContactRepository.java
+USER │   │   │   └── service/ContactService.java
+USER │   │   └── resources/
+USER │   │       ├── application.properties
+USER │   │       ├── data.sql
+USER │   │       └── static/ (index.html, css/, js/)
+USER │   └── test/java/com/addressbook/
+USER │       └── ContactControllerTest.java
+USER └── ARCHITECTURE.md
+USER ```
+USER 
+USER ---
+USER 
+USER ## Section 4: Additional Notes
+USER 
+USER - **H2 Database Configuration:** In-memory or file-based configuration via `application.properties` for development and testing flexibility
+USER - **Sample Data:** 5 sample contacts pre-populated in H2 database on startup via `data.sql` script
+USER - **Validation:** Server-side validation using Spring `@Valid` annotations on controller method parameters with Bean Validation constraints
+USER - **Frontend:** Vanilla JavaScript implementation using Fetch API for all CRUD operations, with client-side validation before API calls
+USER ````
+USER 
+USER src/main/java/com/addressbook/service/ContactService.java
+USER ````
+USER package com.addressbook.service;
+USER 
+USER import com.addressbook.model.Contact;
+USER import com.addressbook.repository.ContactRepository;
+USER import org.springframework.stereotype.Service;
+USER import java.util.List;
+USER 
+USER @Service
+USER public class ContactService {
+USER     private final ContactRepository repository;
+USER 
+USER     public ContactService(ContactRepository repository) {
+USER         this.repository = repository;
+USER     }
+USER 
+USER     public List<Contact> getAllContacts() { return repository.findAll(); }
+USER     public Contact getContactById(Long id) { return repository.findById(id).orElseThrow(); }
+USER     public Contact createContact(Contact contact) { return repository.save(contact); }
+USER     public Contact updateContact(Long id, Contact details) {
+USER         Contact contact = getContactById(id);
+USER         contact.setFirstName(details.getFirstName());
+USER         contact.setLastName(details.getLastName());
+USER         contact.setEmail(details.getEmail());
+USER         contact.setPhoneNumber(details.getPhoneNumber());
+USER         contact.setAddress(details.getAddress());
+USER         contact.setCategory(details.getCategory());
+USER         return repository.save(contact);
+USER     }
+USER     public void deleteContact(Long id) { repository.deleteById(id); }
+USER     public List<Contact> searchContacts(String query) { return repository.search(query); }
+USER }
+USER ````
+USER 
+USER src/main/java/com/addressbook/controller/ContactController.java
+USER ````
+USER package com.addressbook.controller;
+USER 
+USER import com.addressbook.model.Contact;
+USER import com.addressbook.service.ContactService;
+USER import jakarta.validation.Valid;
+USER import org.springframework.http.HttpStatus;
+USER import org.springframework.http.ResponseEntity;
+USER import org.springframework.web.bind.annotation.*;
+USER 
+USER import java.util.List;
+USER 
+USER @RestController
+USER @RequestMapping("/api/contacts")
+USER @CrossOrigin("*")
+USER public class ContactController {
+USER     private final ContactService service;
+USER 
+USER     public ContactController(ContactService service) {
+USER         this.service = service;
+USER     }
+USER 
+USER     @GetMapping
+USER     public List<Contact> getAll() { return service.getAllContacts(); }
+USER 
+USER     @GetMapping("/{id}")
+USER     public Contact getById(@PathVariable Long id) { return service.getContactById(id); }
+USER 
+USER     @PostMapping
+USER     @ResponseStatus(HttpStatus.CREATED)
+USER     public Contact create(@Valid @RequestBody Contact contact) { return service.createContact(contact); }
+USER 
+USER     @PutMapping("/{id}")
+USER     public Contact update(@PathVariable Long id, @Valid @RequestBody Contact contact) {
+USER         return service.updateContact(id, contact);
+USER     }
+USER 
+USER     @DeleteMapping("/{id}")
+USER     @ResponseStatus(HttpStatus.NO_CONTENT)
+USER     public void delete(@PathVariable Long id) { service.deleteContact(id); }
+USER 
+USER     @GetMapping("/search")
+USER     public List<Contact> search(@RequestParam String q) { return service.searchContacts(q); }
+USER }
+USER ````
+USER 
+USER src/main/java/com/addressbook/AddressBookApplication.java
+USER ````
+USER package com.addressbook;
+USER 
+USER import org.springframework.boot.SpringApplication;
+USER import org.springframework.boot.autoconfigure.SpringBootApplication;
+USER 
+USER @SpringBootApplication
+USER public class AddressBookApplication {
+USER 	public static void main(String[] args) {
+USER 		SpringApplication.run(AddressBookApplication.class, args);
+USER 	}
+USER }
+USER ````
+USER 
+USER src/main/resources/static/js/app.js
+USER ````
+USER const API_URL = '/api/contacts';
+USER const contactForm = document.getElementById('contactForm');
+USER const contactList = document.getElementById('contactList');
+USER 
+USER document.addEventListener('DOMContentLoaded', fetchContacts);
+USER 
+USER contactForm.addEventListener('submit', async (e) => {
+USER     e.preventDefault();
+USER     const id = document.getElementById('contactId').value;
+USER     const contact = {
+USER         firstName: document.getElementById('firstName').value,
+USER         lastName: document.getElementById('lastName').value,
+USER         email: document.getElementById('email').value,
+USER         phoneNumber: document.getElementById('phoneNumber').value,
+USER         address: document.getElementById('address').value,
+USER         category: document.getElementById('category').value
+USER     };
+USER 
+USER     const method = id ? 'PUT' : 'POST';
+USER     const url = id ? `${API_URL}/${id}` : API_URL;
+USER 
+USER     await fetch(url, {
+USER         method,
+USER         headers: { 'Content-Type': 'application/json' },
+USER         body: JSON.stringify(contact)
+USER     });
+USER 
+USER     resetForm();
+USER     fetchContacts();
+USER });
+USER 
+USER async function fetchContacts() {
+USER     const res = await fetch(API_URL);
+USER     const contacts = await res.json();
+USER     renderContacts(contacts);
+USER }
+USER 
+USER async function searchContacts() {
+USER     const query = document.getElementById('searchInput').value;
+USER     const res = await fetch(`${API_URL}/search?q=${encodeURIComponent(query)}`);
+USER     const contacts = await res.json();
+USER     renderContacts(contacts);
+USER }
+USER 
+USER function renderContacts(contacts) {
+USER     contactList.innerHTML = '';
+USER     contacts.forEach(c => {
+USER         const tr = document.createElement('tr');
+USER         tr.innerHTML = `
+USER             <td>${c.firstName} ${c.lastName}</td>
+USER             <td>${c.email}</td>
+USER             <td>${c.phoneNumber}</td>
+USER             <td>${c.category}</td>
+USER             <td>
+USER                 <button class="edit-btn" onclick="editContact(${c.id})">Edit</button>
+USER                 <button class="delete-btn" onclick="deleteContact(${c.id})">Delete</button>
+USER             </td>
+USER         `;
+USER         contactList.appendChild(tr);
+USER     });
+USER }
+USER 
+USER async function deleteContact(id) {
+USER     if (confirm('Delete this contact?')) {
+USER         await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+USER         fetchContacts();
+USER     }
+USER }
+USER 
+USER async function editContact(id) {
+USER     const res = await fetch(`${API_URL}/${id}`);
+USER     const c = await res.json();
+USER     document.getElementById('contactId').value = c.id;
+USER     document.getElementById('firstName').value = c.firstName;
+USER     document.getElementById('lastName').value = c.lastName;
+USER     document.getElementById('email').value = c.email;
+USER     document.getElementById('phoneNumber').value = c.phoneNumber;
+USER     document.getElementById('address').value = c.address;
+USER     document.getElementById('category').value = c.category;
+USER     document.getElementById('submitBtn').innerText = 'Update Contact';
+USER     document.getElementById('cancelBtn').style.display = 'inline-block';
+USER }
+USER 
+USER function resetForm() {
+USER     contactForm.reset();
+USER     document.getElementById('contactId').value = '';
+USER     document.getElementById('submitBtn').innerText = 'Add Contact';
+USER     document.getElementById('cancelBtn').style.display = 'none';
+USER }
+USER ````
+USER 
+USER src/main/resources/application.yml
+USER ````
+USER spring:
+USER   datasource:
+USER     url: jdbc:h2:mem:addressbookdb
+USER     driverClassName: org.h2.Driver
+USER     username: sa
+USER     password: 
+USER   jpa:
+USER     database-platform: org.hibernate.dialect.H2Dialect
+USER     hibernate:
+USER       ddl-auto: update
+USER     show-sql: true
+USER   h2:
+USER     console:
+USER       enabled: true
+USER ````
+USER 
+USER pom.xml
+USER ````
+USER <?xml version="1.0" encoding="UTF-8"?>
+USER <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+USER 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+USER 	<modelVersion>4.0.0</modelVersion>
+USER 	<parent>
+USER 		<groupId>org.springframework.boot</groupId>
+USER 		<artifactId>spring-boot-starter-parent</artifactId>
+USER 		<version>3.2.0</version>
+USER 		<relativePath/>
+USER 	</parent>
+USER 	<groupId>com.addressbook</groupId>
+USER 	<artifactId>address-book</artifactId>
+USER 	<version>0.0.1-SNAPSHOT</version>
+USER 	<name>address-book</name>
+USER 	<description>Address Book Web Application</description>
+USER 	<properties>
+USER 		<java.version>17</java.version>
+USER 	</properties>
+USER 	<dependencies>
+USER 		<dependency>
+USER 			<groupId>org.springframework.boot</groupId>
+USER 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+USER 		</dependency>
+USER 		<dependency>
+USER 			<groupId>org.springframework.boot</groupId>
+USER 			<artifactId>spring-boot-starter-web</artifactId>
+USER 		</dependency>
+USER 		<dependency>
+USER 			<groupId>org.springframework.boot</groupId>
+USER 			<artifactId>spring-boot-starter-validation</artifactId>
+USER 		</dependency>
+USER 		<dependency>
+USER 			<groupId>com.h2database</groupId>
+USER 			<artifactId>h2</artifactId>
+USER 			<scope>runtime</scope>
+USER 		</dependency>
+USER 		<dependency>
+USER 			<groupId>org.springframework.boot</groupId>
+USER 			<artifactId>spring-boot-starter-test</artifactId>
+USER 			<scope>test</scope>
+USER 		</dependency>
+USER 	</dependencies>
+USER 	<build>
+USER 		<plugins>
+USER 			<plugin>
+USER 				<groupId>org.springframework.boot</groupId>
+USER 				<artifactId>spring-boot-maven-plugin</artifactId>
+USER 			</plugin>
+USER 		</plugins>
+USER 	</build>
+USER </project>
+USER ````
+USER 
+USER CODER.md
+USER ````
+USER # Address Book Web Application
+USER 
+USER Implement the Address Book Web Application step by step, following the instructions in `ARCHITECTURE.md`.
+USER 
+USER Based on `ARCHITECTURE.md`, I know:
+USER - Backend: Spring Boot with Java 17+, JPA, H2, Validation
+USER - Frontend: HTML/CSS/JS (no frameworks)
+USER - REST API: `/api/contacts`
+USER - Entity: `Contact` with fields: First Name, Last Name, Email, Phone, Address, Category/Tag
+USER 
+USER Let's implement all required files.
+USER 
+USER ## Files to Implement
+USER 
+USER 1. `pom.xml` with Spring Boot Starter Web, Data JPA, Validation, and H2 dependencies.
+USER 2. `src/main/resources/application.yml` configured for H2 in-memory DB and H2 console enabled.
+USER 3. Domain model: `Contact.java` entity with JPA annotations and Jakarta validation.
+USER 4. Repository: `ContactRepository.java` extending `JpaRepository`.
+USER 5. Service & Controller: `ContactService.java` and `ContactController.java` with REST endpoints.
+USER 6. Data initializer: `DataInitializer.java` to seed 5 sample contacts.
+USER 7. Frontend: `src/main/resources/static/index.html`, `styles.css`, and `app.js` providing a clean UI to view, add, edit, search, and delete contacts.
+USER 
+USER Ensure all imports are present and the backend compiles cleanly with `mvn spring-boot:run`.
+USER ````
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER 
+USER # Fix any errors below, if possible.
+USER 
+USER ## Running: mvn compile src/main/java/com/addressbook/controller/ContactController.java
+USER 
+USER [INFO] Scanning for projects...
+USER [INFO] 
+USER [INFO] --------------------< com.addressbook:address-book >--------------------
+USER [INFO] Building address-book 0.0.1-SNAPSHOT
+USER [INFO]   from pom.xml
+USER [INFO] --------------------------------[ jar ]---------------------------------
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] BUILD FAILURE
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] Total time:  0.131 s
+USER [INFO] Finished at: 2026-08-07T14:55:12+02:00
+USER [INFO] ------------------------------------------------------------------------
+USER [ERROR] Unknown lifecycle phase "src/main/java/com/addressbook/controller/ContactController.java". You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy, pre-clean, clean, post-clean, pre-site, site, post-site, site-deploy. -> [Help 1]
+USER [ERROR] 
+USER [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+USER [ERROR] Re-run Maven using the -X switch to enable full debug logging.
+USER [ERROR] 
+USER [ERROR] For more information about the errors and possible solutions, please read the following articles:
+USER [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/LifecyclePhaseNotFoundException
+USER 
+USER ## See relevant line below marked with █.
+USER 
+USER src/main/java/com/addressbook/controller/ContactController.java:
+USER 
+USER 
+USER # Fix any errors below, if possible.
+USER 
+USER ## Running: mvn compile src/main/resources/static/css/styles.css
+USER 
+USER [INFO] Scanning for projects...
+USER [INFO] 
+USER [INFO] --------------------< com.addressbook:address-book >--------------------
+USER [INFO] Building address-book 0.0.1-SNAPSHOT
+USER [INFO]   from pom.xml
+USER [INFO] --------------------------------[ jar ]---------------------------------
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] BUILD FAILURE
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] Total time:  0.134 s
+USER [INFO] Finished at: 2026-08-07T14:55:12+02:00
+USER [INFO] ------------------------------------------------------------------------
+USER [ERROR] Unknown lifecycle phase "src/main/resources/static/css/styles.css". You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy, pre-clean, clean, post-clean, pre-site, site, post-site, site-deploy. -> [Help 1]
+USER [ERROR] 
+USER [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+USER [ERROR] Re-run Maven using the -X switch to enable full debug logging.
+USER [ERROR] 
+USER [ERROR] For more information about the errors and possible solutions, please read the following articles:
+USER [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/LifecyclePhaseNotFoundException
+USER 
+USER ## See relevant line below marked with █.
+USER 
+USER src/main/resources/static/css/styles.css:
+USER 
+USER 
+USER # Fix any errors below, if possible.
+USER 
+USER ## Running: mvn compile src/main/resources/static/js/app.js
+USER 
+USER [INFO] Scanning for projects...
+USER [INFO] 
+USER [INFO] --------------------< com.addressbook:address-book >--------------------
+USER [INFO] Building address-book 0.0.1-SNAPSHOT
+USER [INFO]   from pom.xml
+USER [INFO] --------------------------------[ jar ]---------------------------------
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] BUILD FAILURE
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] Total time:  0.129 s
+USER [INFO] Finished at: 2026-08-07T14:55:13+02:00
+USER [INFO] ------------------------------------------------------------------------
+USER [ERROR] Unknown lifecycle phase "src/main/resources/static/js/app.js". You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy, pre-clean, clean, post-clean, pre-site, site, post-site, site-deploy. -> [Help 1]
+USER [ERROR] 
+USER [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+USER [ERROR] Re-run Maven using the -X switch to enable full debug logging.
+USER [ERROR] 
+USER [ERROR] For more information about the errors and possible solutions, please read the following articles:
+USER [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/LifecyclePhaseNotFoundException
+USER 
+USER ## See relevant line below marked with █.
+USER 
+USER src/main/resources/static/js/app.js:
+USER 
+USER 
+USER # Fix any errors below, if possible.
+USER 
+USER ## Running: mvn compile src/main/java/com/addressbook/repository/ContactRepository.java
+USER 
+USER [INFO] Scanning for projects...
+USER [INFO] 
+USER [INFO] --------------------< com.addressbook:address-book >--------------------
+USER [INFO] Building address-book 0.0.1-SNAPSHOT
+USER [INFO]   from pom.xml
+USER [INFO] --------------------------------[ jar ]---------------------------------
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] BUILD FAILURE
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] Total time:  0.136 s
+USER [INFO] Finished at: 2026-08-07T14:55:14+02:00
+USER [INFO] ------------------------------------------------------------------------
+USER [ERROR] Unknown lifecycle phase "src/main/java/com/addressbook/repository/ContactRepository.java". You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy, pre-clean, clean, post-clean, pre-site, site, post-site, site-deploy. -> [Help 1]
+USER [ERROR] 
+USER [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+USER [ERROR] Re-run Maven using the -X switch to enable full debug logging.
+USER [ERROR] 
+USER [ERROR] For more information about the errors and possible solutions, please read the following articles:
+USER [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/LifecyclePhaseNotFoundException
+USER 
+USER ## See relevant line below marked with █.
+USER 
+USER src/main/java/com/addressbook/repository/ContactRepository.java:
+USER 
+USER 
+USER # Fix any errors below, if possible.
+USER 
+USER ## Running: mvn compile src/main/java/com/addressbook/config/DatabaseInitializer.java
+USER 
+USER [INFO] Scanning for projects...
+USER [INFO] 
+USER [INFO] --------------------< com.addressbook:address-book >--------------------
+USER [INFO] Building address-book 0.0.1-SNAPSHOT
+USER [INFO]   from pom.xml
+USER [INFO] --------------------------------[ jar ]---------------------------------
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] BUILD FAILURE
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] Total time:  0.138 s
+USER [INFO] Finished at: 2026-08-07T14:55:14+02:00
+USER [INFO] ------------------------------------------------------------------------
+USER [ERROR] Unknown lifecycle phase "src/main/java/com/addressbook/config/DatabaseInitializer.java". You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy, pre-clean, clean, post-clean, pre-site, site, post-site, site-deploy. -> [Help 1]
+USER [ERROR] 
+USER [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+USER [ERROR] Re-run Maven using the -X switch to enable full debug logging.
+USER [ERROR] 
+USER [ERROR] For more information about the errors and possible solutions, please read the following articles:
+USER [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/LifecyclePhaseNotFoundException
+USER 
+USER ## See relevant line below marked with █.
+USER 
+USER src/main/java/com/addressbook/config/DatabaseInitializer.java:
+USER 
+USER 
+USER # Fix any errors below, if possible.
+USER 
+USER ## Running: mvn compile src/main/java/com/addressbook/model/Contact.java
+USER 
+USER [INFO] Scanning for projects...
+USER [INFO] 
+USER [INFO] --------------------< com.addressbook:address-book >--------------------
+USER [INFO] Building address-book 0.0.1-SNAPSHOT
+USER [INFO]   from pom.xml
+USER [INFO] --------------------------------[ jar ]---------------------------------
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] BUILD FAILURE
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] Total time:  0.134 s
+USER [INFO] Finished at: 2026-08-07T14:55:15+02:00
+USER [INFO] ------------------------------------------------------------------------
+USER [ERROR] Unknown lifecycle phase "src/main/java/com/addressbook/model/Contact.java". You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy, pre-clean, clean, post-clean, pre-site, site, post-site, site-deploy. -> [Help 1]
+USER [ERROR] 
+USER [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+USER [ERROR] Re-run Maven using the -X switch to enable full debug logging.
+USER [ERROR] 
+USER [ERROR] For more information about the errors and possible solutions, please read the following articles:
+USER [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/LifecyclePhaseNotFoundException
+USER 
+USER ## See relevant line below marked with █.
+USER 
+USER src/main/java/com/addressbook/model/Contact.java:
+USER 
+USER 
+USER # Fix any errors below, if possible.
+USER 
+USER ## Running: mvn compile src/main/java/com/addressbook/service/ContactService.java
+USER 
+USER [INFO] Scanning for projects...
+USER [INFO] 
+USER [INFO] --------------------< com.addressbook:address-book >--------------------
+USER [INFO] Building address-book 0.0.1-SNAPSHOT
+USER [INFO]   from pom.xml
+USER [INFO] --------------------------------[ jar ]---------------------------------
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] BUILD FAILURE
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] Total time:  0.135 s
+USER [INFO] Finished at: 2026-08-07T14:55:15+02:00
+USER [INFO] ------------------------------------------------------------------------
+USER [ERROR] Unknown lifecycle phase "src/main/java/com/addressbook/service/ContactService.java". You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy, pre-clean, clean, post-clean, pre-site, site, post-site, site-deploy. -> [Help 1]
+USER [ERROR] 
+USER [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+USER [ERROR] Re-run Maven using the -X switch to enable full debug logging.
+USER [ERROR] 
+USER [ERROR] For more information about the errors and possible solutions, please read the following articles:
+USER [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/LifecyclePhaseNotFoundException
+USER 
+USER ## See relevant line below marked with █.
+USER 
+USER src/main/java/com/addressbook/service/ContactService.java:
+USER 
+USER 
+USER # Fix any errors below, if possible.
+USER 
+USER ## Running: mvn compile pom.xml
+USER 
+USER [INFO] Scanning for projects...
+USER [INFO] 
+USER [INFO] --------------------< com.addressbook:address-book >--------------------
+USER [INFO] Building address-book 0.0.1-SNAPSHOT
+USER [INFO]   from pom.xml
+USER [INFO] --------------------------------[ jar ]---------------------------------
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] BUILD FAILURE
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] Total time:  0.134 s
+USER [INFO] Finished at: 2026-08-07T14:55:16+02:00
+USER [INFO] ------------------------------------------------------------------------
+USER [ERROR] Unknown lifecycle phase "pom.xml". You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy, pre-clean, clean, post-clean, pre-site, site, post-site, site-deploy. -> [Help 1]
+USER [ERROR] 
+USER [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+USER [ERROR] Re-run Maven using the -X switch to enable full debug logging.
+USER [ERROR] 
+USER [ERROR] For more information about the errors and possible solutions, please read the following articles:
+USER [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/LifecyclePhaseNotFoundException
+USER 
+USER ## See relevant line below marked with █.
+USER 
+USER pom.xml:
+USER 
+USER 
+USER # Fix any errors below, if possible.
+USER 
+USER ## Running: mvn compile src/main/resources/static/index.html
+USER 
+USER [INFO] Scanning for projects...
+USER [INFO] 
+USER [INFO] --------------------< com.addressbook:address-book >--------------------
+USER [INFO] Building address-book 0.0.1-SNAPSHOT
+USER [INFO]   from pom.xml
+USER [INFO] --------------------------------[ jar ]---------------------------------
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] BUILD FAILURE
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] Total time:  0.134 s
+USER [INFO] Finished at: 2026-08-07T14:55:17+02:00
+USER [INFO] ------------------------------------------------------------------------
+USER [ERROR] Unknown lifecycle phase "src/main/resources/static/index.html". You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy, pre-clean, clean, post-clean, pre-site, site, post-site, site-deploy. -> [Help 1]
+USER [ERROR] 
+USER [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+USER [ERROR] Re-run Maven using the -X switch to enable full debug logging.
+USER [ERROR] 
+USER [ERROR] For more information about the errors and possible solutions, please read the following articles:
+USER [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/LifecyclePhaseNotFoundException
+USER 
+USER ## See relevant line below marked with █.
+USER 
+USER src/main/resources/static/index.html:
+USER 
+USER 
+USER # Fix any errors below, if possible.
+USER 
+USER ## Running: mvn compile src/main/java/com/addressbook/AddressBookApplication.java
+USER 
+USER [INFO] Scanning for projects...
+USER [INFO] 
+USER [INFO] --------------------< com.addressbook:address-book >--------------------
+USER [INFO] Building address-book 0.0.1-SNAPSHOT
+USER [INFO]   from pom.xml
+USER [INFO] --------------------------------[ jar ]---------------------------------
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] BUILD FAILURE
+USER [INFO] ------------------------------------------------------------------------
+USER [INFO] Total time:  0.136 s
+USER [INFO] Finished at: 2026-08-07T14:55:17+02:00
+USER [INFO] ------------------------------------------------------------------------
+USER [ERROR] Unknown lifecycle phase "src/main/java/com/addressbook/AddressBookApplication.java". You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy, pre-clean, clean, post-clean, pre-site, site, post-site, site-deploy. -> [Help 1]
+USER [ERROR] 
+USER [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+USER [ERROR] Re-run Maven using the -X switch to enable full debug logging.
+USER [ERROR] 
+USER [ERROR] For more information about the errors and possible solutions, please read the following articles:
+USER [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/LifecyclePhaseNotFoundException
+USER 
+USER ## See relevant line below marked with █.
+USER 
+USER src/main/java/com/addressbook/AddressBookApplication.java:
+USER 
+USER 
+USER 
+USER # *SEARCH/REPLACE block* Rules:
+USER 
+USER Every *SEARCH/REPLACE block* must use this format:
+USER 1. The *FULL* file path alone on a line, verbatim. No bold asterisks, no quotes around it, no escaping of characters, etc.
+USER 2. The opening fence and code language, eg: ````python
+USER 3. The start of search block: <<<<<<< SEARCH
+USER 4. A contiguous chunk of lines to search for in the existing source code
+USER 5. The dividing line: =======
+USER 6. The lines to replace into the source code
+USER 7. The end of the replace block: >>>>>>> REPLACE
+USER 8. The closing fence: ````
+USER 
+USER Use the *FULL* file path, as shown to you by the user.
+USER 
+USER IMPORTANT: Use *quadruple* backticks ```` as fences, not triple backticks!
+USER 
+USER Every *SEARCH* section must *EXACTLY MATCH* the existing file content, character for character, including all comments, docstrings, etc.
+USER If the file contains code or other data wrapped/escaped in json/xml/quotes or other containers, you need to propose edits to the literal contents of the file, including the container markup.
+USER 
+USER *SEARCH/REPLACE* blocks will *only* replace the first match occurrence.
+USER Including multiple unique *SEARCH/REPLACE* blocks if needed.
+USER Include enough lines in each SEARCH section to uniquely match each set of lines that need to change.
+USER 
+USER Keep *SEARCH/REPLACE* blocks concise.
+USER Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
+USER Include just the changing lines, and a few surrounding lines if needed for uniqueness.
+USER Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
+USER 
+USER Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
+USER 
+USER To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+USER 
+USER Pay attention to which filenames the user wants you to edit, especially if they are asking you to create a new file.
+USER 
+USER If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
+USER - A new file path, including dir name if needed
+USER - An empty `SEARCH` section
+USER - The new file's contents in the `REPLACE` section
+USER 
+USER Reply in English.
+USER ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+USER 
+LLM RESPONSE 2026-08-07T14:55:48
+ASSISTANT <thinking-content-7bbeb8e1441453ad999a0bbba8a46d4b>
+ASSISTANT 
+ASSISTANT The user is reporting multiple build failures when running `mvn compile <filename>`.
+ASSISTANT The error messages are: `[ERROR] Unknown lifecycle phase "<filename>". You must specify a valid lifecycle phase or a goal...`
+ASSISTANT 
+ASSISTANT This is because Maven (`mvn`) does not take a file path as an argument to a lifecycle phase like `compile`. The command `mvn compile` compiles the entire project defined in `pom.xml`. If you want to run Maven, you just run `mvn compile` from the project root. You cannot tell Maven to "compile only this specific file" by appending the filename after the command in that way.
+ASSISTANT 
+ASSISTANT The user's error is a misunderstanding of how to use the `mvn` command. They are trying to compile individual files using `mvn compile <path_to_file>`, which is invalid syntax for Maven.
+ASSISTANT 
+ASSISTANT There are no errors in the source code files themselves based on these logs; the "errors" are command-line usage errors.
+ASSISTANT 
+ASSISTANT The user wants me to "Fix any errors below, if possible."
+ASSISTANT Since the errors are in how the user is executing the commands, I cannot fix them by editing the source files (as the source files aren't actually causing the error, the command line usage is).
+ASSISTANT 
+ASSISTANT However, if I were to explain this to the user:
+ASSISTANT The command should be `mvn compile` (to compile everything) or `mvn clean compile`. You don't append filenames to `mvn compile`.
+ASSISTANT 
+ASSISTANT Wait, looking at the prompt, it says "Fix any errors below, if possible."
+ASSISTANT If the error is in the command used by the user, I should explain that. But my instructions say: "ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!".
+ASSISTANT 
+ASSISTANT If I can't fix it by editing files, and I can only return code in a SEARCH/REPLACE block, what should I do?
+ASSISTANT 
+ASSISTANT Actually, looking at the logs again, they are all failures of the form `mvn compile <file>`.
+ASSISTANT The "error" is in the user's command execution.
+ASSISTANT 
+ASSISTANT If I try to find errors in the files provided...
+ASSISTANT `ContactController.java`:
+ASSISTANT ```java
+ASSISTANT package com.addressbook.controller;
+ASSISTANT 
+ASSISTANT import com.addressbook.model.Contact;
+ASSISTANT import com.addressbook.service.ContactService;
+ASSISTANT import jakarta.validation.Valid;
+ASSISTANT import org.springframework.http.HttpStatus;
+ASSISTANT import org.springframework.http.ResponseEntity;
+ASSISTANT import org.springframework.web.bind.annotation.*;
+ASSISTANT 
+ASSISTANT import java.util.List;
+ASSISTANT 
+ASSISTANT @RestController
+ASSISTANT @RequestMapping("/api/contacts")
+ASSISTANT @CrossOrigin("*")
+ASSISTANT public class ContactController {
+ASSISTANT     private final ContactService service;
+ASSISTANT 
+ASSISTANT     public ContactController(ContactService service) {
+ASSISTANT         this.service = service;
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     @GetMapping
+ASSISTANT     public List<Contact> getAll() { return service.getAllContacts(); }
+ASSISTANT 
+ASSISTANT     @GetMapping("/{id}")
+ASSISTANT     public Contact getById(@PathVariable Long id) { return service.getContactById(id); }
+ASSISTANT 
+ASSISTANT     @PostMapping
+ASSISTANT     @ResponseStatus(HttpStatus.CREATED)
+ASSISTANT     public Contact create(@Valid @RequestBody Contact contact) { return service.createContact(contact); }
+ASSISTANT 
+ASSISTANT     @PutMapping("/{id}")
+ASSISTANT     public Contact update(@PathVariable Long id, @Valid @RequestBody Contact contact) {
+ASSISTANT         return service.updateContact(id, contact);
+ASSISTANT     }
+ASSISTANT 
+ASSISTANT     @DeleteMapping("/{id}")
+ASSISTANT     @ResponseStatus(HttpStatus.NO_CONTENT)
+ASSISTANT     public void delete(@PathVariable Long id) { service.deleteContact(id); }
+ASSISTANT 
+ASSISTANT     @GetMapping("/search")
+ASSISTANT     public List<Contact> search(@RequestParam String q) { return service.searchContacts(q); }
+ASSISTANT }
+ASSISTANT ```
+ASSISTANT This looks fine for a Spring Boot controller.
+ASSISTANT 
+ASSISTANT The error is strictly about the Maven command.
+ASSISTANT 
+ASSISTANT Since I cannot fix the user's terminal command by editing their code, and I am restricted to only returning SEARCH/REPLACE blocks, I will inform the user that the error is not in the code but in the way they are calling Maven.
+ASSISTANT 
+ASSISTANT Wait, if I look closely at `ContactController.java`, it imports `org.springframework.http.ResponseEntity` but never uses it. This isn't an error that causes build failure, it's just an unused import.
+ASSISTANT 
+ASSISTANT Actually, I'll check if there are any other issues.
+ASSISTANT `pom.xml` seems fine.
+ASSISTANT `Contact.java` seems fine.
+ASSISTANT `ContactRepository.java` seems fine.
+ASSISTANT `ContactService.java` seems fine.
+ASSISTANT `DatabaseInitializer.java` seems fine.
+ASSISTANT `AddressBookApplication.java` seems fine.
+ASSISTANT 
+ASSISTANT The error `Unknown lifecycle phase "src/main/java/com/addressbook/controller/ContactController.java"` is explicitly telling us that Maven thinks the filename is a lifecycle phase (like `compile`, `test`, `package`).
+ASSISTANT 
+ASSISTANT I will explain this to the user. Since I can only return SEARCH/REPLACE blocks, and there is nothing to fix in the code to make `mvn compile <file>` work (because it's not how Maven works), I should probably just provide a response explaining it. But the system instruction says "ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!".
+ASSISTANT 
+ASSISTANT This is a bit of a catch-22 if the error is in the user's command. However, usually when users provide such logs, they might be expecting me to fix something in the code that they *think* is causing it, or they are testing me.
+ASSISTANT 
+ASSISTANT If I cannot fix the errors via code, I will state that. But wait, maybe I should check if there's a way to make the project compile correctly using `mvn compile`. The current files look correct for a Spring Boot app.
+ASSISTANT 
+ASSISTANT Let's double check the imports and annotations.
+ASSISTANT `ContactController.java`:
+ASSISTANT - `@RestController`, `@RequestMapping`, `@CrossOrigin` are from `org.springframework.web.bind.annotation`. Correct.
+ASSISTANT - `@GetMapping`, `@PostMapping`, etc. Correct.
+ASSISTANT - `@Valid` is `jakarta.validation.Valid`. Correct.
+ASSISTANT - `@ResponseStatus` is `org.springframework.http.HttpStatus`. Correct.
+ASSISTANT - `List` is `java.util.List`. Correct.
+ASSISTANT 
+ASSISTANT The error is definitely the command: `mvn compile <file>`.
+ASSISTANT 
+ASSISTANT I'll tell the user that the errors are due to incorrect Maven usage. Since I must only return code in a SEARCH/REPLACE block, if there's nothing to fix in the files,
