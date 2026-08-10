@@ -6,12 +6,12 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
-import org.springframework.jdbc.datasource.DataSourceInitializer;
+import org.springframework.jdbc.datasource.DataSource;
 
 import java.io.IOException;
 
 @Component
-public class DatabaseInitializer implements ApplicationListener<ContextRefreshedEvent>, DataSourceInitializer {
+public class DatabaseInitializer implements ApplicationListener<ContextRefreshedEvent> {
 
     private final ResourceDatabasePopulator databasePopulator;
 
@@ -25,11 +25,12 @@ public class DatabaseInitializer implements ApplicationListener<ContextRefreshed
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        // Initialization via DataSourceInitializer interface is preferred for Spring Boot
-    }
-
-    @Override
-    public void initializeDatasource(org.springframework.jdbc.datasource.DataSource dataSource) throws IOException {
-        databasePopulator.execute(dataSource);
+        // Get the DataSource from the context
+        DataSource dataSource = event.getApplicationContext().getBean(DataSource.class);
+        try {
+            databasePopulator.execute(dataSource);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to initialize database", e);
+        }
     }
 }
