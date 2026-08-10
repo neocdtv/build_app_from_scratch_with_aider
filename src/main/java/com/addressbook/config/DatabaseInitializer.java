@@ -6,8 +6,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
-import org.springframework.jdbc.datasource.DataSource;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 
 @Component
