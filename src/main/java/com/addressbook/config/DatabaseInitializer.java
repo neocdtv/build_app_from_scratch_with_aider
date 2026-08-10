@@ -8,7 +8,6 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 
 @Component
 public class DatabaseInitializer implements ApplicationListener<ContextRefreshedEvent> {
@@ -29,7 +28,7 @@ public class DatabaseInitializer implements ApplicationListener<ContextRefreshed
         DataSource dataSource = event.getApplicationContext().getBean(DataSource.class);
         try {
             databasePopulator.execute(dataSource);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Failed to initialize database", e);
         }
     }
