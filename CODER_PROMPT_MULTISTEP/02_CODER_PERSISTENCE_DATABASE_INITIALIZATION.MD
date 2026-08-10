@@ -1,0 +1,3 @@
+Now that the Contact entity is defined, let's implement the persistence layer.
+1. Create `src/main/java/com/addressbook/repository/ContactRepository.java` extending JpaRepository. Include a custom derived query method to search by first name, last name, or category.
+2. Create `src/main/java/com/addressbook/config/DatabaseInitializer.java` (or use a `data.sql` script in resources). Pre-populate the H2 database with 5 sample contacts on application startup so we have data to test with.

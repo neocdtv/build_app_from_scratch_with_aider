@@ -1,0 +1,3 @@
+Next, implement the business logic and REST API for the Address Book.
+1. Create `src/main/java/com/addressbook/service/ContactService.java` to handle the business logic (CRUD operations and search).
+2. Create `src/main/java/com/addressbook/controller/ContactController.java`. It must map to `/api/contacts`. Implement GET (all), GET (by id), POST (create), PUT (update), DELETE (by id), and GET `/search?q={query}`. Ensure you use `@Valid` for the POST and PUT endpoints to enforce our entity validations.
