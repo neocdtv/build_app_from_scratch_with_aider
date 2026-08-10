@@ -2,17 +2,16 @@ package com.addressbook.service;
 
 import com.addressbook.model.Contact;
 import com.addressbook.repository.ContactRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ContactService {
 
     private final ContactRepository contactRepository;
 
-    @Autowired
     public ContactService(ContactRepository contactRepository) {
         this.contactRepository = contactRepository;
     }
@@ -21,17 +20,26 @@ public class ContactService {
         return contactRepository.findAll();
     }
 
-    public Contact getContactById(Long id) {
-        return contactRepository.findById(id).orElse(null);
+    public Optional<Contact> getContactById(Long id) {
+        return contactRepository.findById(id);
     }
 
     public Contact createContact(Contact contact) {
         return contactRepository.save(contact);
     }
 
-    public Contact updateContact(Long id, Contact contact) {
-        contact.setId(id);
-        return contactRepository.save(contact);
+    public Contact updateContact(Long id, Contact contactDetails) {
+        return contactRepository.findById(id)
+                .map(contact -> {
+                    contact.setFirstName(contactDetails.getFirstName());
+                    contact.setLastName(contactDetails.getLastName());
+                    contact.setEmail(contactDetails.getEmail());
+                    contact.setPhoneNumber(contactDetails.getPhoneNumber());
+                    contact.setAddress(contactDetails.getAddress());
+                    contact.setCategory(contactDetails.getCategory());
+                    return contactRepository.save(contact);
+                })
+                .orElseThrow(() -> new RuntimeException("Contact not found"));
     }
 
     public void deleteContact(Long id) {
@@ -39,6 +47,6 @@ public class ContactService {
     }
 
     public List<Contact> searchContacts(String query) {
-        return contactRepository.findByFirstNameOrLastNameOrCategoryContaining(query, query, query);
+        return contactRepository.findByFirstNameContainingOrCategoryContaining(query, query);
     }
 }

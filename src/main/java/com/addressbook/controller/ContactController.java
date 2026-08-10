@@ -2,21 +2,19 @@ package com.addressbook.controller;
 
 import com.addressbook.model.Contact;
 import com.addressbook.service.ContactService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/contacts")
-@Validated
 public class ContactController {
 
     private final ContactService contactService;
 
-    @Autowired
     public ContactController(ContactService contactService) {
         this.contactService = contactService;
     }
@@ -27,18 +25,22 @@ public class ContactController {
     }
 
     @GetMapping("/{id}")
-    public Contact getContactById(@PathVariable Long id) {
-        return contactService.getContactById(id);
+    public ResponseEntity<Contact> getContactById(@PathVariable Long id) {
+        return contactService.getContactById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Contact createContact(@Valid @RequestBody Contact contact) {
-        return contactService.createContact(contact);
+    public ResponseEntity<Contact> createContact(@Valid @RequestBody Contact contact) {
+        Contact savedContact = contactService.createContact(contact);
+        return new ResponseEntity<>(savedContact, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public Contact updateContact(@PathVariable Long id, @Valid @RequestBody Contact contact) {
-        return contactService.updateContact(id, contact);
+    public ResponseEntity<Contact> updateContact(@PathVariable Long id, @Valid @RequestBody Contact contactDetails) {
+        Contact updatedContact = contactService.updateContact(id, contactDetails);
+        return ResponseEntity.ok(updatedContact);
     }
 
     @DeleteMapping("/{id}")
