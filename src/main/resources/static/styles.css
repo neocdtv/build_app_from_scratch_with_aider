@@ -1,0 +1,184 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    color: #333;
+}
+
+.search-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.search-section input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.search-section button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.search-section button:hover {
+    background-color: #0056b3;
+}
+
+.form-section, .contacts-section {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-section h2, .contacts-section h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.form-actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#saveButton {
+    background-color: #28a745;
+    color: white;
+}
+
+#saveButton:hover {
+    background-color: #218838;
+}
+
+#cancelButton {
+    background-color: #6c757d;
+    color: white;
+}
+
+#cancelButton:hover {
+    background-color: #5a6268;
+}
+
+#contactsList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.contact-card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: box-shadow 0.3s;
+}
+
+.contact-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.contact-card h3 {
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.contact-card p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.contact-card .contact-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.contact-card .contact-actions button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.contact-card .edit-btn {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.contact-card .delete-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.contact-card .edit-btn:hover {
+    background-color: #e0a800;
+}
+
+.contact-card .delete-btn:hover {
+    background-color: #c82333;
+}
+
+.empty-message {
+    text-align: center;
+    color: #999;
+    padding: 40px;
+}
