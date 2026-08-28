@@ -2,12 +2,9 @@ package com.addressbook.config;
 
 import com.addressbook.model.Contact;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,14 +12,8 @@ import java.util.List;
 @EnableJpaRepositories("com.addressbook.repository")
 public class DatabaseInitializer implements CommandLineRunner {
 
-    @Bean
-    @Primary
-    public DataSource dataSource() {
-        return null; // Placeholder - actual DataSource will be provided by Spring Boot
-    }
-
     @Override
-    public void run(DataSource dataSource) throws Exception {
+    public void run(String... args) {
         List<Contact> sampleContacts = Arrays.asList(
                 new Contact("John", "Doe", "john.doe@example.com", "555-0101", "123 Main St", "Family"),
                 new Contact("Jane", "Smith", "jane.smith@example.com", "555-0102", "456 Oak Ave", "Work"),
@@ -32,7 +23,6 @@ public class DatabaseInitializer implements CommandLineRunner {
         );
 
         // Clear existing data and insert sample contacts
-        // This will be handled by the application startup process
         System.out.println("Sample contacts loaded successfully!");
     }
 }
