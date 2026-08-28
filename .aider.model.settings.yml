@@ -1,0 +1,35 @@
+# .aider.model.settings.yml
+
+- name: openai/weak
+  edit_format: whole
+  use_repo_map: true
+  extra_params:
+    api_base: http://localhost:8083/v1
+    api_key: "dummy"
+    # Low max_tokens prevents long generation if a background prompt leaks through
+    max_tokens: 128
+    temperature: 0.1
+
+- name: openai/architect-simple
+  edit_format: whole
+  use_repo_map: true
+  extra_params:
+    api_base: http://localhost:8081/v1
+    api_key: "dummy"
+    reasoning_tag: "think"
+    temperature: 0.2
+    max_tokens: 8192
+ #   reasoning_effort: "high"
+    # Tell LiteLLM to halt immediately on EOS/EOT tokens
+    stop:
+      - "<|im_end|>"
+      - "<|endoftext|>"      
+
+- name: openai/editor
+  edit_format: editor-diff
+  use_repo_map: false
+  extra_params:
+    api_base: http://localhost:8081/v1
+    api_key: "dummy"
+    temperature: 0.1
+    max_tokens: 8192

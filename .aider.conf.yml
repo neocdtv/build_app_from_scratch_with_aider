@@ -1,0 +1,25 @@
+#model: openai/llama-server
+#openai-api-base: http://localhost:8081/v1
+
+# .aider.conf.yml
+model: openai/architect-simple
+#editor-model: openai/editor
+#architect: true
+openai-api-key: secret
+
+# weak-model: openai/weak
+
+# Disable git auto-committing
+# auto-commits: false
+
+# Prevents Aider from invoking the weak model to generate commit messages
+#attribute-author: false
+#attribute-committer: false
+#commit-prompt: ""
+
+# Disable automatic summarization of past chat history
+max-chat-history-tokens: 0
+
+# Optionally increase history buffer (or set to 0 to disable truncation checks)
+max-chat-history-tokens: 64000
+
