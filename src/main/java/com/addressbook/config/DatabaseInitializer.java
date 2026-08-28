@@ -1,16 +1,26 @@
 package com.addressbook.config;
 
 import com.addressbook.model.Contact;
+import com.addressbook.repository.ContactRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 @EnableJpaRepositories("com.addressbook.repository")
 public class DatabaseInitializer implements CommandLineRunner {
+
+    private final ContactRepository contactRepository;
+
+    public DatabaseInitializer(ContactRepository contactRepository) {
+        this.contactRepository = contactRepository;
+    }
 
     @Override
     public void run(String... args) {
@@ -23,6 +33,8 @@ public class DatabaseInitializer implements CommandLineRunner {
         );
 
         // Clear existing data and insert sample contacts
+        contactRepository.deleteAll();
+        contactRepository.saveAll(sampleContacts);
         System.out.println("Sample contacts loaded successfully!");
     }
 }
