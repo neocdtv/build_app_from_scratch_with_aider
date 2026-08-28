@@ -71,4 +71,9 @@
             </plugin>
         </plugins>
     </build>
+    
+    <properties>
+        <mainClass>com.addressbook.AddressBookApplication</mainClass>
+    </properties>
+
 </project>
