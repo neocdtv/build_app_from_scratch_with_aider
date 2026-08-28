@@ -1,0 +1,89 @@
+# used last
+./bin/llama-server -m ../../models/Qwen3.5-4B-Q4_K_M.gguf \
+    -fa on \
+    --swa-full \
+    --temp 0.6 \
+    --top-p 0.95 \
+    --top-k 20 \
+    --min-p 0.00 \
+    --spec-type draft-mtp  --spec-draft-n-max 2 \
+    --chat-template-kwargs '{"preserve_thinking": true, "enable_thinking": true}'  \
+    --port 8081 \
+    --repeat-penalty 1.15 \
+    --repeat-last-n 128
+
+
+# denkmodus
+./bin/llama-server -m ../../models/Qwen3.5-4B-Q4_K_M.gguf \
+    -fa on \
+    --swa-full \
+    --temp 0.6 \
+    --top-p 0.95 \
+    --top-k 20 \
+    --min-p 0.00 \
+    --spec-type draft-mtp  --spec-draft-n-max 4 \
+    --chat-template-kwargs '{"preserve_thinking": true, "enable_thinking": true}'  \
+    --port 808 \
+    --repeat-penalty 1.15 \
+    --repeat-last-n 128
+    
+    
+# allgemeine aufgaben
+./bin/llama-server -m ../../models/Qwen3.5-4B-Q4_K_M.gguf \
+    --temp 0.6 \
+    --top-p 0.95 \
+    --top-k 20 \
+    --min-p 0.00 \
+    --chat-template-kwargs '{"enable_thinking":true}'  --port 8081 --repeat-penalty 1.15
+    
+# non-thinking, general 
+./bin/llama-server -m ../../models/Qwen3.5-4B-Q4_K_M.gguf \
+    --temp 0.6 \
+    --top-p 0.95 \
+    --top-k 20 \
+    --min-p 0.00 \
+    --port 8001 \
+    --chat-template-kwargs '{"enable_thinking":true}'  --port 8081 --repeat-penalty 1.15
+    
+# reasoning task
+# export LLAMA_CACHE="unsloth/Qwen3.5-9B-GGUF" - was ist das
+./bin/llama-server -m ../../models/Qwen3.5-4B-Q4_K_M.gguf \
+    --temp 1.0 \
+    --top-p 0.95 \
+    --top-k 20 \
+    --min-p 0.00  --port 8081 --repeat-penalty 1.15
+    
+# 
+./bin/llama-server -m ../../models/Qwen3.5-4B-Q4_K_M.gguf \
+    -fa on \
+    --swa-full \
+    --temp 1.0 \
+    --top-p 0.95 \
+    --top-k 20 \
+    --min-p 0.00 \
+    --spec-type draft-mtp  --spec-draft-n-max 2 \
+    --chat-template-kwargs '{"preserve_thinking": true, "enable_thinking": true}'  \
+    --port 8081 \
+    --repeat-penalty 1.15 \
+    --repeat-last-n 128
+    
+# 
+./bin/llama-server -m ../../models/Qwen3.5-4B-Q4_K_M.gguf \
+    --temp 0.6  \
+    --top-p 0.95 \
+    --top-k 20 \
+    --min-p 0.00 \
+    --port 8081 \
+    --chat-template-kwargs '{"enable_thinking":true}'
+
+    
+#
+./bin/llama-server -m ../../models/Qwen3.5-4B-Q4_K_M.gguf \
+    -fa on \
+    --temp 0.6 \
+    --top-p 0.95 \
+    --top-k 20 \
+    --min-p 0.00 \
+    --spec-type draft-mtp  --spec-draft-n-max 2 \
+    --chat-template-kwargs '{"enable_thinking": true}'  \
+    --port 8081
