@@ -1,1 +1,1 @@
--- This file has been deleted
+-- This file has been removed from the project
