@@ -1,0 +1,36 @@
+# Execution Workflow in Aider
+For the best results with the 9B model, run these sequentially in Aider like this:
+
+/add 01_setup_and_model.md
+
+Let it code, commit, then run /drop 01_setup_and_model.md and /clear
+
+/add 02_repository_and_seed.md (and /add any specific java files from step 1 it needs to see)
+
+Let it code, commit, then /drop and /clear
+
+Repeat for steps 3, 4, and 5.
+
+# Guard Against Import Hallucinations
+
+4B models sometimes confuse older Spring Boot imports (javax.validation.*) with modern ones (jakarta.validation.*).
+
+If you see the 4B model using javax.* on Step 1, add a quick one-line reminder in the chat or prompt:
+
+"Use Spring Boot 3 / Java 17+ conventions (jakarta.validation.constraints.* instead of javax)."
+
+# Strict /clear Routine
+While a 35B or 9B model can tolerate some leftover chat history from prior turns, a 4B model will degrade rapidly if old prompts are left in memory.
+
+Make sure your turn-by-turn workflow strictly follows:
+
+Run the prompt file.
+
+Verify code compiles/saves (git commit).
+
+Run /clear to drop 100% of the conversation history.
+
+Move to the next step file.
+
+If you follow these three habits, a 4B model can pull off this entire 5-step build smoothly.
+
