@@ -1,14 +1,11 @@
 package com.addressbook.repository;
 
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import com.addressbook.model.Contact;
 
-@Component
 public class DatabaseInitializer implements CommandLineRunner {
 
     private static final List<Contact> SAMPLE_CONTACTS = List.of(
@@ -59,10 +56,11 @@ public class DatabaseInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // Check if table exists and has records before inserting sample data
-        Long existingCount = entityManager.createQuery("SELECT COUNT(*) FROM Contact")
-            .getSingleResult();
+        Long existingCount = (Long) entityManager.createQuery(
+                "SELECT COUNT(*) FROM Contact"
+            ).getSingleResult();
             
-        if (existingCount == 0) {
+        if (existingCount == 0L) {
             for (Contact contact : SAMPLE_CONTACTS) {
                 entityManager.persist(contact);
             }
@@ -79,10 +77,5 @@ public class DatabaseInitializer implements CommandLineRunner {
         } catch (Exception e) {
             System.out.println("Table already exists: " + e.getMessage());
         }
-    }
-
-    @Bean
-    public CommandLineRunner initializeDatabase(EntityManager em) {
-        return args -> run(args); // Reuse the same logic to avoid duplication
     }
 }
