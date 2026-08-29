@@ -18,16 +18,12 @@
     api_key: "dummy"
     reasoning_tag: "think"
     temperature: 0.6
-    pretty: false
     max_tokens: 8192
  #   reasoning_effort: "high"
     # Tell LiteLLM to halt immediately on EOS/EOT tokens
     stop:
       - "<|im_end|>"
-      - "<|endoftext|>"     
-    extra_params:
-        min_p: 0.05
-        top_p: 0.95      
+      - "<|endoftext|>"      
 
 - name: openai/editor
   edit_format: editor-diff
