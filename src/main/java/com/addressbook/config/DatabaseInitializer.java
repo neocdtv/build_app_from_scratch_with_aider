@@ -16,7 +16,7 @@ public class DatabaseInitializer implements CommandLineRunner {
     private ContactRepository contactRepository;
 
     @Override
-    public void run() {
+    public void run(String... args) {
         List<Contact> sampleContacts = Arrays.asList(
             new Contact("John", "Doe", "john.doe@example.com", "555-0101", "123 Main St", "Family"),
             new Contact("Jane", "Smith", "jane.smith@example.com", "555-0102", "456 Oak Ave", "Work"),
