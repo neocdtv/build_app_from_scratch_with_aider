@@ -15,15 +15,6 @@ public class DatabaseInitializer implements CommandLineRunner {
     }
     
     @Override
-    public void run(Iterable<Object> args) {
-        if (args != null) {
-            for (Object arg : args) {
-                // Just placeholder, we'll populate sample data directly
-            }
-        }
-    }
-    
-    @Override
     public void run(String... args) {
         // Populate sample contacts on startup
         contactRepository.saveAll(createSampleContacts());
