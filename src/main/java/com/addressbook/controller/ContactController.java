@@ -64,7 +64,7 @@ public class ContactController {
     }
 
     @GetMapping("/search")
-    public List<Contact> searchContacts(@RequestParam String query) {
+    public List<Contact> searchContacts(@RequestParam(defaultValue = "") String query) {
         return contactService.searchContacts(query);
     }
 }
