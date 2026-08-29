@@ -1,7 +1,8 @@
-# llama-server
+# Qwen3.5-4B-Q4_K_M.gguf
+## llama-server
 ./bin/llama-server -m ../../models/Qwen3.5-4B-Usloth-MTP/Qwen3.5-4B-Q4_K_M.gguf  --spec-type draft-mtp --spec-draft-n-max 2 -fa on --reasoning on -c 32000 -ngl 99 --port 8081  --jinja
 
-# .aider.model.settings.yml
+## .aider.model.settings.yml - reasoning_effort is default medium
 
 - name: openai/architect
   edit_format: whole
@@ -11,9 +12,28 @@
     api_key: "dummy"
     reasoning_tag: "think"
     temperature: 0.6
-    pretty: false
     max_tokens: 8192
-#   reasoning_effort: "high"
+    reasoning_effort: "high"
+    # Tell LiteLLM to halt immediately on EOS/EOT tokens
+    stop:
+      - "<|im_end|>"
+      - "<|endoftext|>"    
+
+# Qwen3.5-4B-UD-Q4_K_XL.gguf
+## 
+./bin/llama-server -m ../../models/Qwen3.5-4B-Usloth-MTP/Qwen3.5-4B-UD-Q4_K_XL.gguf  --spec-type draft-mtp --spec-draft-n-max 2 -fa on --reasoning on -c 16000 -ngl 99 --port 8082  --jinja 
+
+## reasoning_effort is default medium, this seems to be to to high for this model - is it to intelligent and tries to make to much?
+- name: openai/architect
+  edit_format: whole
+  use_repo_map: true
+  extra_params:
+    api_base: http://localhost:8081/v1
+    api_key: "dummy"
+    reasoning_tag: "think"
+    temperature: 0.6
+    max_tokens: 8192
+    reasoning_effort: "low"
     # Tell LiteLLM to halt immediately on EOS/EOT tokens
     stop:
       - "<|im_end|>"
