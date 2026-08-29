@@ -2,7 +2,7 @@
 #openai-api-base: http://localhost:8081/v1
 
 # .aider.conf.yml
-model: openai/architect-simple
+model: openai/architect
 #editor-model: openai/editor
 #architect: true
 openai-api-key: secret

@@ -10,11 +10,11 @@
     max_tokens: 128
     temperature: 0.1
 
-- name: openai/architect-simple
+- name: openai/architect
   edit_format: whole
   use_repo_map: true
   extra_params:
-    api_base: http://localhost:8081/v1
+    api_base: http://localhost:8082/v1
     api_key: "dummy"
     reasoning_tag: "think"
     temperature: 0.2
