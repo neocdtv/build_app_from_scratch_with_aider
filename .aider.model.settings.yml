@@ -19,7 +19,7 @@
     reasoning_tag: "think"
     temperature: 0.6
     max_tokens: 8192
- #   reasoning_effort: "high"
+    reasoning_effort: "low"
     # Tell LiteLLM to halt immediately on EOS/EOT tokens
     stop:
       - "<|im_end|>"
