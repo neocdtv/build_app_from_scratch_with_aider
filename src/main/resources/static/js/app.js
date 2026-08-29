@@ -35,7 +35,7 @@ function setupEventListeners() {
 // Load all contacts
 async function loadContacts() {
     try {
-        const response = await fetch(`${API_BASE}/`);
+        const response = await fetch(API_BASE);
         if (response.ok) {
             const data = await response.json();
             contacts = data;
@@ -180,9 +180,6 @@ function editContact(id) {
     isEditing = true;
     submitBtn.textContent = 'Update Contact';
     cancelBtn.style.display = 'inline-block';
-    contactForm.reset();
-    contactForm.reset();
-    contactForm.reset();
     contactForm.reset();
 }
 
