@@ -108,6 +108,7 @@ async function createContact(contactData) {
         }
         
         showNotification('Contact added successfully', 'success');
+        loadContacts(); // Refresh UI after successful creation
     } catch (error) {
         console.error('Error creating contact:', error);
         showNotification('Error creating contact', 'error');
@@ -130,6 +131,7 @@ async function updateContact(id, contactData) {
         }
         
         showNotification('Contact updated successfully', 'success');
+        loadContacts(); // Refresh UI after successful update
     } catch (error) {
         console.error('Error updating contact:', error);
         showNotification('Error updating contact', 'error');
@@ -152,6 +154,7 @@ async function deleteContact(id) {
         }
         
         showNotification('Contact deleted successfully', 'success');
+        loadContacts(); // Refresh UI after successful deletion
     } catch (error) {
         console.error('Error deleting contact:', error);
         showNotification('Error deleting contact', 'error');
