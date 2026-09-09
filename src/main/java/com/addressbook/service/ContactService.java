@@ -55,7 +55,7 @@ public class ContactService {
             return contactRepository.findAll();
         }
 
-        Specification<Contact> spec = (root, queryCriteriaBuilder, queryCriteriaBuilder) -> {
+        Specification<Contact> spec = (root, queryCriteriaBuilder, criteriaBuilder) -> {
             return queryCriteriaBuilder.or(
                 queryCriteriaBuilder.like(
                     queryCriteriaBuilder.lower(root.get("myName")),
