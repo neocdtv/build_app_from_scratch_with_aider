@@ -11,9 +11,9 @@ public class Contact {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "First name is required")
-    @Size(max = 50, message = "First name must not exceed 50 characters")
-    private String firstName;
+    @NotBlank(message = "Name is required")
+    @Size(max = 50, message = "Name must not exceed 50 characters")
+    private String myName;
 
     @NotBlank(message = "Last name is required")
     @Size(max = 50, message = "Last name must not exceed 50 characters")
@@ -40,9 +40,9 @@ public class Contact {
     public Contact() {
     }
 
-    public Contact(String firstName, String lastName, String email, 
+    public Contact(String myName, String lastName, String email, 
                    String phoneNumber, String address, String category) {
-        this.firstName = firstName;
+        this.myName = myName;
         this.lastName = lastName;
         this.email = email;
         this.phoneNumber = phoneNumber;
@@ -58,12 +58,12 @@ public class Contact {
         this.id = id;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getMyName() {
+        return myName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setMyName(String myName) {
+        this.myName = myName;
     }
 
     public String getLastName() {
