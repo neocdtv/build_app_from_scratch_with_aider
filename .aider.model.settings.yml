@@ -11,7 +11,8 @@
     temperature: 0.1
 
 - name: openai/architect
-  edit_format: whole
+#  edit_format: whole
+  edit_format: diff
   use_repo_map: true
   extra_params:
     api_base: http://localhost:8081/v1
