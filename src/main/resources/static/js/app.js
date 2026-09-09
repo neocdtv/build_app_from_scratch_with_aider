@@ -154,15 +154,13 @@ async function handleSubmit(event) {
         return;
     }
     
-    // Success
+    // Success - reload contacts to reflect the change
     showMessage(contactId ? 'Contact updated successfully' : 'Contact created successfully');
     CONTACT_FORM.reset();
     ID_INPUT.value = '';
     
-    if (contactId) {
-        // Re-render to show updated contact
-        loadContacts();
-    }
+    // Always reload contacts after successful operation
+    loadContacts();
 }
 
 // Edit contact
