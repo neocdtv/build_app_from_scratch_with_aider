@@ -59,12 +59,12 @@ public class ContactService {
             String queryLower = query.toLowerCase();
             String pattern = "%" + queryLower + "%";
             
-            return queryCriteriaBuilder.or(
-                queryCriteriaBuilder.like(
+            return criteriaBuilder.or(
+                criteriaBuilder.like(
                     criteriaBuilder.lower(root.get("myName")),
                     pattern
                 ),
-                queryCriteriaBuilder.like(
+                criteriaBuilder.like(
                     criteriaBuilder.lower(root.get("category")),
                     pattern
                 )
