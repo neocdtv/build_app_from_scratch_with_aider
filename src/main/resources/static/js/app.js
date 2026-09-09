@@ -24,8 +24,7 @@ function setupEventListeners() {
     contactForm.addEventListener('submit', handleFormSubmit);
     cancelBtn.addEventListener('click', resetForm);
     submitBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        handleFormSubmit();
+        handleFormSubmit(e);
     });
 }
 
@@ -81,7 +80,9 @@ function displayContacts(contacts) {
 }
 
 async function handleFormSubmit(e) {
-    e.preventDefault();
+    if (e) {
+        e.preventDefault();
+    }
 
     const formData = {
         myName: document.getElementById('myName').value,
