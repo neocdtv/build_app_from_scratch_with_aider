@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +32,7 @@ public class DatabaseInitializer implements ApplicationRunner {
     }
 
     @Override
-    public void run(org.springframework.boot.context.event.RunnerContext runnerContext) {
+    public void run(ApplicationContext applicationContext) {
         if (contactRepository.count() == 0L) {
             contactRepository.saveAll(getSampleContacts());
             log.info("Pre-populated {} sample contacts into the database.", getSampleContacts().size());
