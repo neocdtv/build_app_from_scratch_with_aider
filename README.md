@@ -19,7 +19,7 @@ Larger parameter models are capable of comprehending the full context and genera
 ### Aider Execution Steps
 ```text
 /read-only ARCHITECTURE.md CODER_PROMPT.md
-/exec CODER_PROMPT.md
+exec CODER_PROMPT.md
 ```
 
 ---
@@ -39,7 +39,7 @@ Smaller models are not capable of handling all architectural and coding aspects 
 **Step 01: Setup and Model**
 ```text
 /read-only ARCHITECT_CODER_PROMPT_MULTISTEP/01_setup_and_model.md
-/exec ARCHITECT_CODER_PROMPT_MULTISTEP/01_setup_and_model.md
+exec ARCHITECT_CODER_PROMPT_MULTISTEP/01_setup_and_model.md
 ```
 * **Test:** Run `./run.sh` to compile and start the Spring Boot web app. *Expect this to fail (~90% of the time) due to a missing `mainClass`. This is expected, as the class is generated in Step 02.*
 * **Cleanup:** 
@@ -52,7 +52,7 @@ Smaller models are not capable of handling all architectural and coding aspects 
 **Step 02: Repository and Seed**
 ```text
 /read-only ARCHITECT_CODER_PROMPT_MULTISTEP/02_repository_and_seed.md
-/exec ARCHITECT_CODER_PROMPT_MULTISTEP/02_repository_and_seed.md
+exec ARCHITECT_CODER_PROMPT_MULTISTEP/02_repository_and_seed.md
 ```
 * **Test:** Run `./run.sh`. This step generates the `mainClass`, so the Spring Boot application should now start successfully.
 * **Cleanup:** Run `/clear` and `/drop ARCHITECT_CODER_PROMPT_MULTISTEP`.
@@ -60,7 +60,7 @@ Smaller models are not capable of handling all architectural and coding aspects 
 **Step 03: Service Layer**
 ```text
 /read-only ARCHITECT_CODER_PROMPT_MULTISTEP/03_service_layer.md
-/exec ARCHITECT_CODER_PROMPT_MULTISTEP/03_service_layer.md
+exec ARCHITECT_CODER_PROMPT_MULTISTEP/03_service_layer.md
 ```
 * **Test:** Run `./run.sh`.
 * **Cleanup:** Run `/clear` and `/drop ARCHITECT_CODER_PROMPT_MULTISTEP`.
@@ -68,7 +68,7 @@ Smaller models are not capable of handling all architectural and coding aspects 
 **Step 04: API Controller**
 ```text
 /read-only ARCHITECT_CODER_PROMPT_MULTISTEP/04_api_controller.md
-/exec ARCHITECT_CODER_PROMPT_MULTISTEP/04_api_controller.md
+exec ARCHITECT_CODER_PROMPT_MULTISTEP/04_api_controller.md
 ```
 * **Test:** Run `./run.sh`.
 * **Cleanup:** Run `/clear` and `/drop ARCHITECT_CODER_PROMPT_MULTISTEP`.
@@ -76,7 +76,7 @@ Smaller models are not capable of handling all architectural and coding aspects 
 **Step 05: Frontend UI**
 ```text
 /read-only ARCHITECT_CODER_PROMPT_MULTISTEP/05_frontend_ui.md
-/exec ARCHITECT_CODER_PROMPT_MULTISTEP/05_frontend_ui.md
+exec ARCHITECT_CODER_PROMPT_MULTISTEP/05_frontend_ui.md
 ```
 * **Test:** Run `./run.sh`.
 * **Cleanup:** Run `/clear` and `/drop ARCHITECT_CODER_PROMPT_MULTISTEP`.
