@@ -32,14 +32,14 @@ function displayContacts(contacts) {
     
     contactsBody.innerHTML = contacts.map(contact => `
         <tr>
-            <td>${escapeHtml(contact.getFirstName() || '')} ${escapeHtml(contact.getLastName() || '')}</td>
-            <td>${escapeHtml(contact.getEmail() || '')}</td>
-            <td>${escapeHtml(contact.getPhoneNumber() || '')}</td>
-            <td>${escapeHtml(contact.getCategory() || '')}</td>
+            <td>${escapeHtml(contact.firstName || '')} ${escapeHtml(contact.lastName || '')}</td>
+            <td>${escapeHtml(contact.email || '')}</td>
+            <td>${escapeHtml(contact.phoneNumber || '')}</td>
+            <td>${escapeHtml(contact.category || '')}</td>
             <td>
                 <div class="action-buttons">
-                    <button type="button" class="btn-edit" onclick="editContact(${contact.getId()})">Edit</button>
-                    <button type="button" class="btn-delete" onclick="deleteContact(${contact.getId()})">Delete</button>
+                    <button type="button" class="btn-edit" onclick="editContact(${contact.id})">Edit</button>
+                    <button type="button" class="btn-delete" onclick="deleteContact(${contact.id})">Delete</button>
                 </div>
             </td>
         </tr>
@@ -151,13 +151,13 @@ function editContact(id) {
             return response.json();
         })
         .then(contact => {
-            document.getElementById('contactId').value = contact.getId();
-            document.getElementById('firstName').value = contact.getFirstName();
-            document.getElementById('lastName').value = contact.getLastName();
-            document.getElementById('email').value = contact.getEmail();
-            document.getElementById('phoneNumber').value = contact.getPhoneNumber();
-            document.getElementById('address').value = contact.getAddress();
-            document.getElementById('category').value = contact.getCategory();
+            document.getElementById('contactId').value = contact.id;
+            document.getElementById('firstName').value = contact.firstName;
+            document.getElementById('lastName').value = contact.lastName;
+            document.getElementById('email').value = contact.email;
+            document.getElementById('phoneNumber').value = contact.phoneNumber;
+            document.getElementById('address').value = contact.address;
+            document.getElementById('category').value = contact.category;
             
             document.getElementById('formTitle').textContent = 'Edit Contact';
             document.getElementById('submitBtn').textContent = 'Update Contact';
