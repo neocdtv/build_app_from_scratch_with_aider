@@ -24,6 +24,21 @@
     stop:
       - "<|im_end|>"
       - "<|endoftext|>"      
+      
+- name: openai/MiniCPM5-2B
+  edit_format: whole
+  use_repo_map: true
+  extra_params:
+    api_base: http://localhost:8081/v1
+    api_key: "dummy"
+    reasoning_tag: "think"
+    temperature: 1.0
+    max_tokens: 32768
+    reasoning_effort: "medium"
+    # Tell LiteLLM to halt immediately on EOS/EOT tokens
+    stop:
+      - "<|im_end|>"
+      - "<|endoftext|>"    
 
 - name: openai/editor
   edit_format: editor-diff
