@@ -2,7 +2,8 @@ package com.addressbook.service;
 
 import com.addressbook.model.Contact;
 import com.addressbook.repository.ContactRepository;
-import org.springframework.data.repository.NotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class ContactService {
 
     public Contact getContact(Long id) {
         return contactRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("No contact found with id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No contact found with id: " + id));
     }
 
     public List<Contact> search(String q) {
@@ -37,14 +38,14 @@ public class ContactService {
     public Contact update(Contact request) {
         Long id = request.getId();
         if (!contactRepository.existsById(id)) {
-            throw new NotFoundException("No contact found with id: " + id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No contact found with id: " + id);
         }
         return contactRepository.save(request);
     }
 
     public void delete(Long id) {
         if (!contactRepository.existsById(id)) {
-            throw new NotFoundException("No contact found with id: " + id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No contact found with id: " + id);
         }
         contactRepository.deleteById(id);
     }
