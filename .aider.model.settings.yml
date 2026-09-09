@@ -18,7 +18,7 @@
     api_key: "dummy"
     reasoning_tag: "think"
     temperature: 0.8
-    max_tokens: 8192
+    max_tokens: 32768
     reasoning_effort: "medium"
     # Tell LiteLLM to halt immediately on EOS/EOT tokens
     stop:
