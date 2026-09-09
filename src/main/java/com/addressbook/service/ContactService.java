@@ -56,14 +56,17 @@ public class ContactService {
         }
 
         Specification<Contact> spec = (root, queryCriteriaBuilder, criteriaBuilder) -> {
+            String queryLower = query.toLowerCase();
+            String pattern = "%" + queryLower + "%";
+            
             return queryCriteriaBuilder.or(
                 queryCriteriaBuilder.like(
-                    queryCriteriaBuilder.lower(root.get("myName")),
-                    "%" + query.toLowerCase() + "%"
+                    criteriaBuilder.function(root.get("myName"), criteriaBuilder.lower()),
+                    pattern
                 ),
                 queryCriteriaBuilder.like(
-                    queryCriteriaBuilder.lower(root.get("category")),
-                    "%" + query.toLowerCase() + "%"
+                    criteriaBuilder.function(root.get("category"), criteriaBuilder.lower()),
+                    pattern
                 )
             );
         };
