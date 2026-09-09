@@ -46,13 +46,6 @@ public class Contact {
     @Size(max = 50, message = "Category must not exceed 50 characters")
     private String category;
 
-    @PreInsert
-    private void preInsert() {
-        if (this.id == null) {
-            this.id = new java.util.UUID().toString().getBytes().toLong();
-        }
-    }
-
     public Long getId() {
         return id;
     }
