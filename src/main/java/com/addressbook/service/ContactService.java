@@ -61,11 +61,11 @@ public class ContactService {
             
             return queryCriteriaBuilder.or(
                 queryCriteriaBuilder.like(
-                    criteriaBuilder.function(root.get("myName"), criteriaBuilder.lower()),
+                    criteriaBuilder.lower(root.get("myName")),
                     pattern
                 ),
                 queryCriteriaBuilder.like(
-                    criteriaBuilder.function(root.get("category"), criteriaBuilder.lower()),
+                    criteriaBuilder.lower(root.get("category")),
                     pattern
                 )
             );
