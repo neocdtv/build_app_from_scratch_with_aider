@@ -1,0 +1,15 @@
+package com.addressbook.repository;
+
+import com.addressbook.model.Contact;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ContactRepository extends JpaRepository<Contact, Long> {
+
+    boolean existsByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(
+            String firstName, String lastName, String category);
+
+    java.util.List<Contact> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(
+            String firstName, String lastName, String category);
+}
