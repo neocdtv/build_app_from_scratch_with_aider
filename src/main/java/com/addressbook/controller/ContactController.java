@@ -6,7 +6,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.method.annotation.MethodArgumentNotValidException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +20,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
-import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/contacts")
@@ -56,8 +57,9 @@ public class ContactController {
     }
 
     @PutMapping("/{id}")
-    public Contact update(@PathVariable Long id, @Valid @RequestBody Contact contact) {
-        return contactService.update(id, contact);
+    public ResponseEntity<Contact> update(@PathVariable Long id, @Valid @RequestBody Contact contact) {
+        Contact updated = contactService.update(id, contact);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
@@ -76,13 +78,13 @@ public class ContactController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, Object> handleValidation(MethodArgumentNotValidException ex) {
         var binding = ex.getBindingResult();
-        var errors = new java.util.LinkedHashMap<String, String>();
+        Map<String, String> errors = new LinkedHashMap<>();
         for (var err : binding.getFieldErrors()) {
             if (!errors.containsKey(err.getField())) {
                 errors.put(err.getField(), err.getDefaultMessage());
             }
         }
-        Map<String, Object> body = new java.util.HashMap<>();
+        Map<String, Object> body = new LinkedHashMap<>();
         body.put("error", "Input validation failed");
         body.put("fields", errors);
         return body;
