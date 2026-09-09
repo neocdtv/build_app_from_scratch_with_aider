@@ -4,7 +4,6 @@ import com.addressbook.model.Contact;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.stereotype.Repository? not needed
 
 import java.util.List;
 
