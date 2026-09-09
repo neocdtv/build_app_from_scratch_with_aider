@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address Book</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="app-header">
+    <h1>📒 Address Book</h1>
+    <p class="subtitle">Manage your contacts &mdash; add, edit, search and delete.</p>
+</header>
+
+<main class="container">
+    <!-- Add / Edit form -->
+    <section id="form-panel" class="card">
+        <div class="panel-head">
+            <h2 id="form-title">Add New Contact</h2>
+            <button type="button" id="cancel-form" class="btn btn-ghost hidden">Cancel</button>
+        </div>
+
+        <form id="contact-form" novalidate>
+            <input type="hidden" id="contact-id">
+
+            <div class="grid grid-2">
+                <div class="field">
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" maxlength="50" required>
+                    <span class="error-msg" data-for="firstName"></span>
+                </div>
+                <div class="field">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" maxlength="50" required>
+                    <span class="error-msg" data-for="lastName"></span>
+                </div>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" maxlength="100" required>
+                    <span class="error-msg" data-for="email"></span>
+                </div>
+                <div class="field">
+                    <label for="phoneNumber">Phone Number</label>
+                    <input type="text" id="phoneNumber" maxlength="20" required>
+                    <span class="error-msg" data-for="phoneNumber"></span>
+                </div>
+            </div>
+
+            <div class="field full">
+                <label for="address">Address</label>
+                <input type="text" id="address" maxlength="255" required>
+                <span class="error-msg" data-for="address"></span>
+            </div>
+
+            <div class="field full">
+                <label for="category">Category / Tag</label>
+                <input type="text" id="category" maxlength="50" list="category-suggestions" required>
+                <datalist id="category-suggestions">
+                    <option value="Family"></option>
+                    <option value="Work"></option>
+                    <option value="Friends"></option>
+                    <option value="Other"></option>
+                </datalist>
+                <span class="error-msg" data-for="category"></span>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" id="save-btn" class="btn btn-primary">Save Contact</button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Search -->
+    <section class="search-bar">
+        <input type="search" id="search-input" placeholder="Search by name or category...">
+        <button type="button" id="clear-search" class="btn btn-ghost hidden">Clear</button>
+    </section>
+
+    <!-- Results summary -->
+    <div class="results-summary">
+        <span id="result-count"></span>
+    </div>
+
+    <!-- Contacts grid -->
+    <section id="contacts-grid" class="grid grid-cards"></section>
+</main>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="/app.js"></script>
+</body>
+</html>
