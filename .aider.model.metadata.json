@@ -1,0 +1,15 @@
+{
+  "openai/architect": {
+    "max_input_tokens": 128000,
+    "max_output_tokens": 32768,
+    "max_tokens": 32768,
+    "litellm_provider": "openai",
+    "mode": "chat"
+  },
+  "openai/editor": {
+    "max_input_tokens": 400000,
+    "max_output_tokens": 4096,
+    "litellm_provider": "openai",
+    "mode": "chat"
+  }
+}
