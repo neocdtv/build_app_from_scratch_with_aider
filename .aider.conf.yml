@@ -2,7 +2,8 @@
 #openai-api-base: http://localhost:8081/v1
 
 # .aider.conf.yml
-model: openai/architect
+# model: openai/architect
+model: openai/qwen35-4B-MTP-2
 # model: openai/MiniCPM5-2B
 #editor-model: openai/editor
 #architect: true

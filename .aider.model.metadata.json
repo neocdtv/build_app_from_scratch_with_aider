@@ -6,6 +6,27 @@
     "litellm_provider": "openai",
     "mode": "chat"
   },
+  "openai/qwen35-4B-MTP-2-Q4-K-M": {
+    "max_input_tokens": 128000,
+    "max_output_tokens": 32768,
+    "max_tokens": 32768,
+    "litellm_provider": "openai",
+    "mode": "chat"
+  },
+  "openai/qwen35-4B": {
+    "max_input_tokens": 128000,
+    "max_output_tokens": 32768,
+    "max_tokens": 32768,
+    "litellm_provider": "openai",
+    "mode": "chat"
+  },
+  "openai/qwen36-35B-MTP-2": {
+    "max_input_tokens": 128000,
+    "max_output_tokens": 32768,
+    "max_tokens": 32768,
+    "litellm_provider": "openai",
+    "mode": "chat"
+  },
   "openai/editor": {
     "max_input_tokens": 400000,
     "max_output_tokens": 4096,

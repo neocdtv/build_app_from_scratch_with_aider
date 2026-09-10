@@ -10,9 +10,9 @@
     max_tokens: 128
     temperature: 0.1
 
-- name: openai/architect
+- name: openai/qwen35-4B-MTP-2-Q4-K-M
 #  edit_format: whole
-  edit_format: diff
+  edit_format: whole
   use_repo_map: true
   extra_params:
     api_base: http://localhost:8081/v1
@@ -20,7 +20,23 @@
     reasoning_tag: "think"
     temperature: 0.8
     max_tokens: 32768
-    reasoning_effort: "high"
+    reasoning_effort: "medium"
+    # Tell LiteLLM to halt immediately on EOS/EOT tokens
+    stop:
+      - "<|im_end|>"
+      - "<|endoftext|>"     
+
+- name: openai/architect
+#  edit_format: whole
+  edit_format: whole
+  use_repo_map: true
+  extra_params:
+    api_base: http://localhost:8081/v1
+    api_key: "dummy"
+    reasoning_tag: "think"
+    temperature: 0.8
+    max_tokens: 32768
+    reasoning_effort: "medium"
     # Tell LiteLLM to halt immediately on EOS/EOT tokens
     stop:
       - "<|im_end|>"
