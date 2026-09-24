@@ -3,7 +3,7 @@
 
 # .aider.conf.yml
 # model: openai/architect
-model: openai/qwen35-4B-MTP-2
+model: openai/qwen35-4B-MTP-2-Q4-K-M
 # model: openai/MiniCPM5-2B
 #editor-model: openai/editor
 #architect: true
