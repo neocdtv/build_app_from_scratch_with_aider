@@ -53,7 +53,7 @@ public class ContactController {
         contactService.deleteContact(id);
     }
 
-    @GetMapping("/search?q={query}")
+    @GetMapping("/search")
     public List<Contact> searchContacts(@RequestParam("q") String query) {
         return contactService.searchContacts(query);
     }
