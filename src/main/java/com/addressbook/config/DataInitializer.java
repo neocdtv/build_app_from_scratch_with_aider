@@ -2,7 +2,7 @@ package com.addressbook.config;
 
 import com.addressbook.model.Contact;
 import com.addressbook.repository.ContactRepository;
-import org.springframework.boot.autoconfigure.event.ApplicationReadyEvent;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
