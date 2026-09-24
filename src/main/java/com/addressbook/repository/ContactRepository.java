@@ -11,9 +11,9 @@ import java.util.List;
 @Repository
 public interface ContactRepository extends JpaRepository<Contact, Long> {
 
-    @Query("SELECT c FROM Contact c WHERE LOWER(c.firstName) LIKE LOWER(:q) " +
-           "OR LOWER(c.lastName) LIKE LOWER(:q) " +
-           "OR LOWER(c.email) LIKE LOWER(:q) " +
-           "OR LOWER(c.category) LIKE LOWER(:q)")
+    @Query("SELECT c FROM Contact c WHERE LOWER(c.firstName) LIKE CONCAT(LOWER(:q), '%') " +
+           "OR LOWER(c.lastName) LIKE CONCAT(LOWER(:q), '%') " +
+           "OR LOWER(c.email) LIKE CONCAT(LOWER(:q), '%') " +
+           "OR LOWER(c.category) LIKE CONCAT(LOWER(:q), '%')")
     List<Contact> searchContacts(@Param("q") String query);
 }
