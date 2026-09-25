@@ -3,7 +3,7 @@
 
 # .aider.conf.yml
 # model: openai/architect
-model: openai/qwen35-4B-MTP-2-Q4-K-M
+model: openai/bonsai-2-27B
 # model: openai/MiniCPM5-2B
 #editor-model: openai/editor
 #architect: true
@@ -25,6 +25,6 @@ max-chat-history-tokens: 0
 # Optionally increase history buffer (or set to 0 to disable truncation checks)
 max-chat-history-tokens: 64000
 
-pretty: false
+# pretty: false
 
 
