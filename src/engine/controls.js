@@ -10,15 +10,14 @@ class Controls {
         this.touchActive = false;
         this.touchStart = { x: 0, y: 0 };
         this.moveState = { x: 0, y: 0 };
-        this.controls = null;
-        this.desktopControls = null;
-        this.keys = {};
-        this.lastTime = 0;
         this.moveX = 0;
         this.moveZ = 0;
         this.lookX = 0;
         this.lookY = 0;
         this.jump = false;
+        this.keys = {};
+        this.lastTime = 0;
+        this.player = null;
     }
 
     init(player) {
@@ -100,16 +99,13 @@ class Controls {
         const deltaY = e.touches[0].clientY - this.touchStart.y;
         this.touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
         
-        // Mobile: left half of screen for movement, right half for look
         const screenMid = window.innerWidth / 2;
         const touchX = e.touches[0].clientX;
         
         if (touchX < screenMid) {
-            // Left side - movement
             this.moveX = Math.max(-1, Math.min(1, deltaX * 0.01));
             this.moveZ = Math.max(-1, Math.min(1, deltaY * 0.01));
         } else {
-            // Right side - look
             this.lookX = deltaX * 0.002;
             this.lookY = deltaY * 0.002;
             this.camera.rotation.y -= this.lookX;
@@ -167,11 +163,9 @@ class Controls {
     }
 
     update() {
-        // Update player input from keyboard
         this.handleKeyDown();
         this.handleKeyUp();
         
-        // Update player
         if (this.player) {
             this.player.update(0.016);
         }
