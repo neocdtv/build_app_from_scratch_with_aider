@@ -7,24 +7,43 @@ class Chunk {
         this.chunkSize = 16;
         this.data = [];
         this.mesh = null;
-        this.init();
+        this.generateTerrain();
     }
 
-    init() {
-        // Initialize 16x16x16 3D array with air blocks (0)
+    // Simplex noise implementation for procedural terrain
+    simplexNoise(x, y, z) {
+        // Simple 3D noise using sine waves for lightweight generation
+        const scale = 0.1;
+        const freq = 0.05;
+        const amplitude = 12;
+        
+        return Math.sin(x * freq) * amplitude +
+               Math.cos(y * freq) * amplitude +
+               Math.sin(z * freq) * amplitude;
+    }
+
+    generateTerrain() {
+        // Initialize 16x16x16 3D array
         this.data = new Array(this.chunkSize * this.chunkSize * this.chunkSize).fill(0);
 
-        // Create static test blocks - fill cube with dirt (1) except top layer (grass - 2)
         for (let x = 0; x < this.chunkSize; x++) {
-            for (let y = 0; y < this.chunkSize; y++) {
-                for (let z = 0; z < this.chunkSize; z++) {
-                    let typeId = 0;
-                    if (y > 0) {
-                        typeId = 1; // dirt
+            for (let z = 0; z < this.chunkSize; z++) {
+                // Calculate noise-based height at this position
+                const noiseValue = this.simplexNoise(x, 0, z);
+                const height = Math.floor(Math.max(1, Math.min(12, noiseValue + 6)));
+                
+                for (let y = 0; y < this.chunkSize; y++) {
+                    let typeId = 0; // air
+                    
+                    // Fill from bottom up to the height
+                    if (y < height) {
+                        if (y === height - 1) {
+                            typeId = 2; // grass on top
+                        } else {
+                            typeId = 1; // dirt below grass
+                        }
                     }
-                    if (y === this.chunkSize - 1) {
-                        typeId = 2; // grass on top
-                    }
+                    
                     this.data[this.getIndex(x, y, z)] = typeId;
                 }
             }
@@ -58,6 +77,7 @@ class Chunk {
         
         this.mesh = new THREE.InstancedMesh(geometry, new THREE.MeshLambertMaterial({ color: 0x888888 }), count);
         this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+        this.mesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
         
         let index = 0;
         const matrix = new THREE.Matrix4();
@@ -72,7 +92,7 @@ class Chunk {
                         matrix.identity();
                     } else {
                         // Position block in world space
-                        const chunkPosition = new THREE.Vector3(this.x * this.chunkSize, y, this.z * this.chunkSize);
+                        const chunkPosition = new THREE.Vector3(this.x * this.chunkSize, 0, this.z * this.chunkSize);
                         const blockPosition = new THREE.Vector3(x, y, z);
                         
                         matrix.setPosition(chunkPosition.clone().add(blockPosition));
@@ -106,7 +126,7 @@ class Chunk {
                         matrix.identity();
                     } else {
                         // Position block in world space
-                        const chunkPosition = new THREE.Vector3(this.x * this.chunkSize, y, this.z * this.chunkSize);
+                        const chunkPosition = new THREE.Vector3(this.x * this.chunkSize, 0, this.z * this.chunkSize);
                         const blockPosition = new THREE.Vector3(x, y, z);
 
                         matrix.setPosition(chunkPosition.clone().add(blockPosition));
