@@ -1,14 +1,14 @@
 import { Renderer } from './engine/renderer.js';
 import { Controls } from './engine/controls.js';
 import Player from './player/player.js';
-import { Raycaster } from 'three';
+import THREE from 'three';
 
 const canvas = document.getElementById('canvas');
 const renderer = new Renderer(canvas);
 const controls = new Controls(renderer, canvas);
 const player = new Player(8, 0, renderer.camera);
 
-const raycaster = new Raycaster();
+const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
 const fpsElement = document.getElementById('fps-counter');
@@ -18,6 +18,7 @@ const blockInfoElement = document.getElementById('block-info');
 let lastTime = performance.now();
 let frameCount = 0;
 let fps = 0;
+let targetBlock = null;
 
 controls.init(player);
 
@@ -43,8 +44,6 @@ function loadBlocks() {
 // Save modified blocks to LocalStorage
 function saveBlocks() {
     const chunks = [];
-    renderer.renderer.render(renderer.scene, renderer.camera);
-    
     renderer.renderer.children.forEach(child => {
         if (child.userData && child.userData.chunk) {
             const chunk = child.userData.chunk;
@@ -62,98 +61,6 @@ function saveBlocks() {
     
     localStorage.setItem('voxelBlocks', JSON.stringify(chunks));
 }
-
-controls.setupDesktop = () => {
-    controls.canvas.addEventListener('click', () => controls.lockPointer());
-    controls.canvas.addEventListener('mousemove', (e) => controls.handleMouseMove(e));
-    controls.setupDesktopInput();
-};
-
-controls.setupMobile = () => {
-    controls.canvas.addEventListener('touchstart', (e) => controls.handleTouchStart(e), { passive: false });
-    controls.canvas.addEventListener('touchmove', (e) => controls.handleTouchMove(e), { passive: false });
-    controls.canvas.addEventListener('touchend', (e) => controls.handleTouchEnd(e), { passive: false });
-};
-
-controls.setupKeyboard = () => {
-    window.addEventListener('keydown', (e) => {
-        controls.keys[e.code] = true;
-    });
-    window.addEventListener('keyup', (e) => {
-        controls.keys[e.code] = false;
-    });
-};
-
-controls.setupDesktopInput = () => {
-    if (controls.desktopControls) {
-        controls.desktopControls.detach();
-    }
-    controls.desktopControls = new PointerLockControls(controls.camera, controls.canvas);
-    controls.desktopControls.addEventListener('lock', () => {
-        controls.pointerLocked = true;
-    });
-    controls.desktopControls.addEventListener('unlock', () => {
-        controls.pointerLocked = false;
-    });
-    renderer.scene.add(controls.desktopControls);
-};
-
-controls.lockPointer = () => {
-    if (!controls.pointerLocked) {
-        controls.desktopControls.lock();
-    }
-};
-
-controls.handleMouseMove = (e) => {
-    if (controls.pointerLocked) {
-        controls.camera.rotation.y -= e.movementX * 0.002;
-        controls.camera.rotation.x -= e.movementY * 0.002;
-        controls.camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, controls.camera.rotation.x));
-    }
-};
-
-controls.handleTouchStart = (e) => {
-    e.preventDefault();
-    controls.touchActive = true;
-    controls.touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    controls.setupMobileInput();
-};
-
-controls.handleTouchMove = (e) => {
-    if (!controls.touchActive) return;
-    e.preventDefault();
-    const deltaX = e.touches[0].clientX - controls.touchStart.x;
-    const deltaY = e.touches[0].clientY - controls.touchStart.y;
-    controls.touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    
-    const screenMid = window.innerWidth / 2;
-    const touchX = e.touches[0].clientX;
-    
-    if (touchX < screenMid) {
-        controls.moveX = Math.max(-1, Math.min(1, deltaX * 0.01));
-        controls.moveZ = Math.max(-1, Math.min(1, deltaY * 0.01));
-    } else {
-        controls.lookX = deltaX * 0.002;
-        controls.lookY = deltaY * 0.002;
-        controls.camera.rotation.y -= controls.lookX;
-        controls.camera.rotation.x -= controls.lookY;
-        controls.camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, controls.camera.rotation.x));
-    }
-};
-
-controls.handleTouchEnd = (e) => {
-    controls.touchActive = false;
-    controls.setupMobileInput();
-};
-
-controls.update = () => {
-    controls.handleKeyDown();
-    controls.handleKeyUp();
-    
-    if (controls.player) {
-        controls.player.update(0.016);
-    }
-};
 
 // FPS counter
 const updateFPS = () => {
@@ -187,16 +94,14 @@ const updateUI = () => {
     blockInfoElement.textContent = `Target: ${targetBlock ? targetBlock.type : 'Air'}`;
 };
 
-let targetBlock = null;
-
 // Raycasting for block interaction
 function raycastInteraction() {
-    mouse.x = (player.position.x / window.innerWidth) * 2 - 1;
-    mouse.y = -(player.position.z / window.innerHeight) * 2 + 1;
+    mouse.x = (player.position.x - window.innerWidth / 2) / window.innerWidth * 2;
+    mouse.y = -(player.position.z - window.innerHeight / 2) / window.innerHeight * 2 + 1;
     
     raycaster.setFromCamera({ x: mouse.x, y: mouse.y }, renderer.camera);
     
-    const intersects = raycaster.intersectObjects(renderer.renderer.children);
+    const intersects = raycaster.intersectObjects(renderer.renderer.scene.children);
     
     if (intersects.length > 0) {
         const intersect = intersects[0];
