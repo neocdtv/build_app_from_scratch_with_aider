@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Three.js Voxel Game</title>
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="overlay">
+    <h1>Three.js Voxel Game</h1>
+    <p>Click to play.</p>
+    <p>WASD to move, mouse to look, Space to jump.</p>
+    <p>Left-click removes a block. Right-click places a block.</p>
+  </div>
+
+  <div id="game"></div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
