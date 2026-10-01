@@ -66,9 +66,47 @@ class Chunk {
     setBlock(x, y, z, typeId) {
         if (x >= 0 && x < this.chunkSize && y >= 0 && y < this.chunkSize && z >= 0 && z < this.chunkSize) {
             const index = this.getIndex(x, y, z);
+            const oldTypeId = this.data[index];
             this.data[index] = typeId;
             this.updateMesh();
+            return oldTypeId;
         }
+        return 0;
+    }
+
+    getBlockAtRaycast(rayOrigin, rayDirection) {
+        // Trace ray through the voxel world to find blocks
+        const step = 0.5;
+        const maxDistance = 50;
+        const origin = rayOrigin.clone();
+        const direction = rayDirection.clone().normalize();
+        
+        for (let t = 0; t < maxDistance; t += step) {
+            const worldX = origin.x + direction.x * t;
+            const worldY = origin.y + direction.y * t;
+            const worldZ = origin.z + direction.z * t;
+            
+            const chunkX = Math.floor(worldX / this.chunkSize);
+            const chunkZ = Math.floor(worldZ / this.chunkSize);
+            
+            // For simplicity, assume we're in our own chunk
+            const localX = worldX - this.x * this.chunkSize;
+            const localZ = worldZ - this.z * this.chunkSize;
+            const localY = Math.floor(worldY);
+            
+            const blockType = this.getBlock(localX, localY, localZ);
+            
+            if (blockType !== 0) {
+                return {
+                    x: localX,
+                    y: localY,
+                    z: localZ,
+                    type: blockType
+                };
+            }
+        }
+        
+        return null;
     }
 
     createMesh() {
@@ -78,6 +116,7 @@ class Chunk {
         this.mesh = new THREE.InstancedMesh(geometry, new THREE.MeshLambertMaterial({ color: 0x888888 }), count);
         this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
         this.mesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
+        this.mesh.userData.chunk = this;
         
         let index = 0;
         const matrix = new THREE.Matrix4();
