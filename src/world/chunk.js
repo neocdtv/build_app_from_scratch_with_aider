@@ -4,6 +4,7 @@ export class Chunk {
     constructor() {
         this.blockData = this.createBlockData();
         this.mesh = this.createInstancedMesh();
+        this.generateTerrain();
     }
 
     createBlockData() {
@@ -13,7 +14,7 @@ export class Chunk {
             for (let y = 0; y < 16; y++) {
                 data[x][y] = [];
                 for (let z = 0; z < 16; z++) {
-                    data[x][y][z] = 2; // Initialize with grass
+                    data[x][y][z] = 0; // Initialize with air
                 }
             }
         }
@@ -25,15 +26,11 @@ export class Chunk {
         const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 }); // Grass color
         const mesh = new THREE.InstancedMesh(geometry, material, 16 * 16 * 16);
 
+        // Initialize the instanceMatrix with identity matrices
         const instanceMatrix = new Float32Array(16 * 16 * 16 * 16);
-        for (let x = 0; x < 16; x++) {
-            for (let y = 0; y < 16; y++) {
-                for (let z = 0; z < 16; z++) {
-                    const index = z * 16 * 16 + y * 16 + x;
-                    const matrix = new THREE.Matrix4().makeTranslation(x, y, z);
-                    matrix.toArray(instanceMatrix, index * 16);
-                }
-            }
+        for (let i = 0; i < 16 * 16 * 16; i++) {
+            const matrix = new THREE.Matrix4().identity();
+            matrix.toArray(instanceMatrix, i * 16);
         }
 
         mesh.instanceMatrix.set(instanceMatrix);
@@ -53,5 +50,31 @@ export class Chunk {
         }
 
         this.blockData[x][y][z] = typeId;
+    }
+
+    getNoise(x, z) {
+        // Simple 2D noise using sine and cosine for a natural undulating look
+        const value = Math.sin(x * 0.1) * Math.cos(z * 0.1) +
+                      Math.sin(x * 0.2) * Math.cos(z * 0.2) +
+                      Math.sin(x * 0.3) * Math.cos(z * 0.3);
+        return value * 6 + 6; // Scales to 0–12
+    }
+
+    generateTerrain() {
+        const noiseScale = 0.1;
+        const maxHeight = 12;
+
+        for (let x = 0; x < 16; x++) {
+            for (let z = 0; z < 16; z++) {
+                const noiseValue = this.getNoise(x * noiseScale, z * noiseScale);
+                const height = Math.floor(noiseValue);
+                const clampedHeight = Math.max(0, Math.min(maxHeight, height));
+
+                for (let y = 0; y <= clampedHeight; y++) {
+                    const typeId = (y === clampedHeight) ? BLOCK_GRASS : BLOCK_DIRT;
+                    this.setBlock(x, y, z, typeId);
+                }
+            }
+        }
     }
 }
