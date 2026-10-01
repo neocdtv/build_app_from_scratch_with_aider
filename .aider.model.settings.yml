@@ -26,6 +26,22 @@
       - "<|im_end|>"
       - "<|endoftext|>"    
 
+- name: openai/qwen35-4B-MTP-2-Q8
+#  edit_format: whole
+  edit_format: whole
+  use_repo_map: true
+  extra_params:
+    api_base: http://localhost:8081/v1
+    api_key: "dummy"
+    reasoning_tag: "think"
+    temperature: 0.8
+    max_tokens: 32768
+    reasoning_effort: "medium"
+    # Tell LiteLLM to halt immediately on EOS/EOT tokens
+    stop:
+      - "<|im_end|>"
+      - "<|endoftext|>"     
+
 - name: openai/qwen35-4B-MTP-2-Q4-K-M
 #  edit_format: whole
   edit_format: whole
