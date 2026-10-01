@@ -28,7 +28,7 @@ function loadBlocks() {
         try {
             const blocks = JSON.parse(savedData);
             blocks.forEach(block => {
-                const chunk = controls.renderer.scene.children.find(child => child.userData && child.userData.chunk);
+                const chunk = renderer.renderer.scene.children.find(child => child.userData && child.userData.chunk);
                 if (chunk && chunk.userData.chunk) {
                     const chunkObj = chunk.userData.chunk;
                     chunkObj.setBlock(block.x, block.y, block.z, block.type);
@@ -62,38 +62,6 @@ function saveBlocks() {
     
     localStorage.setItem('voxelBlocks', JSON.stringify(chunks));
 }
-
-controls.init = (player) => {
-    controls.renderer = renderer;
-    controls.canvas = canvas;
-    controls.camera = renderer.camera;
-    controls.pointerLocked = false;
-    controls.touchActive = false;
-    controls.touchStart = { x: 0, y: 0 };
-    controls.moveState = { x: 0, y: 0 };
-    controls.moveX = 0;
-    controls.moveZ = 0;
-    controls.lookX = 0;
-    controls.lookY = 0;
-    controls.jump = false;
-    controls.setupDesktop();
-    controls.setupMobile();
-    
-    // Prevent default touch behavior for UI elements
-    document.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-    }, { passive: false });
-    
-    document.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-    }, { passive: false });
-    
-    window.addEventListener('resize', () => {
-        renderer.resize();
-    });
-    
-    controls.setupKeyboard();
-};
 
 controls.setupDesktop = () => {
     controls.canvas.addEventListener('click', () => controls.lockPointer());
